@@ -1,9 +1,12 @@
+#include <iostream>
 #include <unistd.h>
 #include <stdio.h>
 using namespace std;
 
 int main()
 {
+	cout<< "LED Flash start" << endl;
+
    FILE *export_file = NULL; //declare pointers
    FILE *IO_direction = NULL;
    FILE *IO_value = NULL;
@@ -11,7 +14,7 @@ int main()
    char str2[] = "1";
    char str3[] = "out";
    char str[] = "59";
-
+	
    //this part here exports gpio59
    // echo 59 > export
 //    export_file = fopen ("/sys/class/gpio/export", "w");
@@ -39,5 +42,6 @@ int main()
         fclose (IO_value);
         usleep (1000000); //delay for a second
         }
+cout << "LED Flash end" << endl;
     return 0;
 }
