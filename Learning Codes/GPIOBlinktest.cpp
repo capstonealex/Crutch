@@ -28,19 +28,19 @@ int main()
    fclose(IO_direction);
 
 
-   usleep (1000000);
+   usleep (100000);
     // echo 1 > value
     // echo 0 > value
-   for (int i=0; i<10; i++){ //blink LED 10 times
+   for (int i=0; i<100; i++){ //blink LED 10 times
         IO_value = fopen ("/sys/class/gpio/gpio59/value", "w");
         fwrite (str2, 1, sizeof(str2), IO_value); //set the pin to HIGH
         fclose (IO_value);
-        usleep (1000000); //delay for a second
+        usleep (100000); //delay for a second
 
         IO_value = fopen ("/sys/class/gpio/gpio59/value", "w");
         fwrite (str1, 1, sizeof(str1), IO_value); //set the pin to LOW
         fclose (IO_value);
-        usleep (1000000); //delay for a second
+        usleep (100000); //delay for a second
         }
 cout << "LED Flash end" << endl;
     return 0;
