@@ -4,7 +4,7 @@
 Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
-    populate();
+    populateDictionary();
 
 }
 
@@ -31,7 +31,7 @@ void Crutch::printVector(vector<vector<string>> const &mat)
         cout << '\n';
     }
 }
-void Crutch::populate(){
+void Crutch::populateDictionary(){
     intLookupTable["normal"] = 1;
     intLookupTable["feet together"] = 2;
     intLookupTable["backstep"] = 3;
@@ -42,4 +42,19 @@ void Crutch::populate(){
     intLookupTable["uneven"] = 8;
     intLookupTable["Sit Down"] = 9;
     intLookupTable["Stand Up"] = 10;
+}
+void Crutch::setHeartBeat(int val){
+
+}
+void Crutch::setNextMotion(int val){
+
+}
+void Crutch::setGreenButon(int val){
+
+}
+int Crutch::getCurrentMotion(){
+
+}
+int Crutch::getCurrentState(){
+    
 }

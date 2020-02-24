@@ -16,13 +16,12 @@ using namespace std;
 class Crutch
 {
 private:
-    /* data */
+    /* Jagged array for Current state, next motion relationship */
     vector<vector<string>> nextMotion{
         {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Stand Up"}};
-
 public:
     Crutch(/* args */);
     ~Crutch();
@@ -31,5 +30,11 @@ public:
     void printVector(vector<vector<string>> const &mat);
     /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
     std::map<std::string, int> intLookupTable;
-    void populate();
+    void populateDictionary();
+    //OD interfaces 
+    void setHeartBeat(int val);
+    void setNextMotion(int val);
+    void setGreenButon(int val);
+    int getCurrentMotion();
+    int getCurrentState();
 };
