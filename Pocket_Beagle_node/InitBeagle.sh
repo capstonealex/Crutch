@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#initialisation of Virtual CAN interface and CANopen nodes for 
-#testing of socket connections.
 
 #echo "Enter name for prev log file (don't enter extension)"
 #read newname

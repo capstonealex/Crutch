@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     bool_t rebootEnable = false;  /* Configurable by arguments */
 
     /*set up command line arguments as variables*/
-    char CANdevice[10] = "can1"; /* change to can1 for bbb vcan0 for virtual can*/
+    char CANdevice[10] = "vcan0"; /* change to can1 for bbb vcan0 for virtual can*/
     nodeId = NODEID;
     CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */
@@ -511,7 +511,6 @@ static void *rt_control_thread(void *arg)
     }
     while (CO_endProgram == 0)
     {
-        // std::cout << "1.RT Control THREAD\n";
         app_program1ms();
         wait_rest_of_period(&pinfo);
     }

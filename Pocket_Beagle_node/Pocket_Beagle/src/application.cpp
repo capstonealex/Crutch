@@ -25,6 +25,10 @@
  */
 
 #include "CANopen.h"
+#include "Crutch.h"
+#include <iostream>
+
+Crutch exoCrutch;
 
 /******************************************************************************/
 void app_programStart(void)
@@ -49,4 +53,7 @@ void app_programAsync(uint16_t timer1msDiff)
 /******************************************************************************/
 void app_program1ms(void)
 {
+    exoCrutch.run();
+    // CO_OD_RAM.currentState = 100;
+    // std::cout << "Crutch state: " << CO_OD_RAM.currentState << std::endl;
 }

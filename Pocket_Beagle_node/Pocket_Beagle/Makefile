@@ -11,12 +11,14 @@ STACK_DIR = src/CANopenNode/stack
 SOCKETCAN_DIR = src/CANopenNode/stack/socketCAN
 OD_DIR = src/objDict
 TARGET_FOLDER = bin/
+CRUTCH_DIR = src/Crutch
 LINK_TARGET  =  $ Pocket_Beagle
 
 INCLUDE_DIRS = 	-I$(SRC_DIR) \
 				-I$(CAN_DIR)    \
 				-I$(STACK_DIR)  \
 				-I$(SOCKETCAN_DIR)  \
+				-I$(CRUTCH_DIR)  \
 				-I$(OD_DIR) 
 
 
