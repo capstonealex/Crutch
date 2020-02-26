@@ -5,7 +5,6 @@ Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
     populateDictionary();
-
 }
 
 Crutch::~Crutch()
@@ -17,7 +16,7 @@ void Crutch::run()
 {
     std::cout << "Crutch program running!" << std::endl;
     std::string name = nextMotion[RIGHT_FORWARD][3];
-    std::cout << nextMotion[RIGHT_FORWARD][3]<< " : " << intLookupTable[name] << std::endl;
+    std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << intLookupTable[name] << std::endl;
 }
 
 void Crutch::printVector(vector<vector<string>> const &mat)
@@ -31,10 +30,11 @@ void Crutch::printVector(vector<vector<string>> const &mat)
         cout << '\n';
     }
 }
-void Crutch::populateDictionary(){
+void Crutch::populateDictionary()
+{
     intLookupTable["normal"] = 1;
-    intLookupTable["feet together"] = 2;
-    intLookupTable["backstep"] = 3;
+    intLookupTable["backstep"] = 2;
+    intLookupTable["feet together"] = 3;
     intLookupTable["up stairs"] = 4;
     intLookupTable["down stairs"] = 5;
     intLookupTable["up slope"] = 6;
@@ -43,18 +43,18 @@ void Crutch::populateDictionary(){
     intLookupTable["Sit Down"] = 9;
     intLookupTable["Stand Up"] = 10;
 }
-void Crutch::setHeartBeat(int val){
-
+void Crutch::setHeartBeat(int val)
+{
 }
-void Crutch::setNextMotion(int val){
-
+void Crutch::setNextMotion(int val)
+{
 }
-void Crutch::setGreenButon(int val){
-
+void Crutch::setGreenButon(int val)
+{
 }
-int Crutch::getCurrentMotion(){
-
+int Crutch::getCurrentMotion()
+{
 }
-int Crutch::getCurrentState(){
-    
+int Crutch::getCurrentState()
+{
 }
