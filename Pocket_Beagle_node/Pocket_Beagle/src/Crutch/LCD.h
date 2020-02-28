@@ -27,6 +27,7 @@ public:
 	void setCurrState(int cs);
 	void setNextMove(int nm);
 	void flash();
+	void populateMap();
 private:
 	int currState;
 	int nextMove;

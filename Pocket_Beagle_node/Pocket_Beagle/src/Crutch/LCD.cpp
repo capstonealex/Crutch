@@ -25,7 +25,7 @@ LCD::LCD() {
 	lcd = new LiquidCrystal_I2C(LCD_ADDR, LCD_COLS, LCD_ROWS, I2C_BUS);
 	lcd->configure_i2c_pins(PIN1, PIN2);
 	lcd->init();
-	/* TODO: set up map */
+	populateMap();
 	std::cout << "LCD object created" << std::endl;
 }
 
@@ -33,6 +33,7 @@ LCD::~LCD() {
 	lcd->clear();
 	lcd->noCursor();
 	lcd->noBacklight();
+	lcd->noBlink();
 	lcd->noDisplay();
 	delete lcd;
 	std::cout << "LCD object deleted" << std::endl;
@@ -60,17 +61,13 @@ void LCD::setup(){
 }
 
 void LCD::printCurrState(){
-	lcd->cursor();
-	lcd->setCursor(3,0);
-	printStr(intToName[currState]);
-	lcd->noCursor();
+	clearCurrState();
+	printStr(intToName[currState], 3, 0);
 }
 
 void LCD::printNextMove(){
-	lcd->cursor();
-	lcd->setCursor(3, 1);
-	printStr(intToName[nextMove]);
-	lcd->noCursor();
+	clearNextMove();
+	printStr(intToName[nextMove], 3, 1);
 }
 
 void LCD::clearCurrState(){
@@ -111,6 +108,11 @@ void LCD::flash(){
 	lcd->noBacklight();
 	sleep(1);
 	lcd->backlight();
+}
+
+void populateMap(){
+	//TODO: add maps from integer to name of state/move
+	//intToName[] = ;
 }
 
 
