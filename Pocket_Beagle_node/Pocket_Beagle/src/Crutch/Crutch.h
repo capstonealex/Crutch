@@ -1,5 +1,5 @@
 /*
-* Cructch Object running on pocket Beagle
+* Crutch Object running on pocket Beagle
 *
 *
 */
@@ -9,6 +9,14 @@
 #define STANDING 2
 #define SITTING 3
 
+#include "LCD.h"
+
+class Crutch
+{
+private:
+    /* data */
+	int currState;
+	int nextMove;
 #include <string>
 #include <vector>
 #include <map>
@@ -26,6 +34,8 @@ public:
     Crutch(/* args */);
     ~Crutch();
     void run();
+    void printCSNM();
+    LCD *lcd;
     void initCrutch();
     void printVector(vector<vector<string>> const &mat);
     /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
