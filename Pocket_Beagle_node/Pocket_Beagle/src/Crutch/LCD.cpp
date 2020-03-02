@@ -110,7 +110,7 @@ void LCD::flash(){
 	lcd->backlight();
 }
 
-void populateMap(){
+void LCD::populateMap(){
 	//TODO: add maps from integer to name of state/move
 	//intToName[] = ;
 }
