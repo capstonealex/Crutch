@@ -33,6 +33,9 @@ Crutch exoCrutch;
 /******************************************************************************/
 void app_programStart(void)
 {
+    // Testing LCD TRANSITIONS
+    exoCrutch.stateIndex = 1;
+    exoCrutch.setCurrentState(exoCrutch.stateIndex);
 }
 
 /******************************************************************************/
@@ -54,6 +57,5 @@ void app_programAsync(uint16_t timer1msDiff)
 void app_program1ms(void)
 {
     exoCrutch.run();
-    // CO_OD_RAM.currentState = 100;
-    // std::cout << "Crutch state: " << CO_OD_RAM.currentState << std::endl;
+    exo.printCSNM();
 }

@@ -10,13 +10,6 @@
 #define SITTING 3
 
 #include "LCD.h"
-
-class Crutch
-{
-private:
-    /* data */
-	int currState;
-	int nextMove;
 #include <string>
 #include <vector>
 #include <map>
@@ -30,6 +23,10 @@ private:
         {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Stand Up"}};
+    /* data */
+    int currState;
+    int nextMove;
+
 public:
     Crutch(/* args */);
     ~Crutch();
@@ -40,11 +37,19 @@ public:
     void printVector(vector<vector<string>> const &mat);
     /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
     std::map<std::string, int> intLookupTable;
+    std::map<int, std::string> stateLookupTable;
     void populateDictionary();
-    //OD interfaces 
+    //OD interfaces
     void setHeartBeat(int val);
     void setNextMotion(int val);
     void setGreenButon(int val);
     int getCurrentMotion();
     int getCurrentState();
+    //For Testing w.o. object Dicitonary
+    void crutchTest();
+    void setCurrentMotion(int state);
+    void setCurrentState(int state);
+    void incrementCount();
+    int counter;
+    int stateIndex;
 };
