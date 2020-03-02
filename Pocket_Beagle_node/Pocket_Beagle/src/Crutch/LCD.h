@@ -28,10 +28,10 @@ public:
 	void setNextMove(int nm);
 	void flash();
 	void populateMap();
+	std::map<int, std::string> stateLookupTable;
 
 private:
 	int currState;
 	int nextMove;
 	LiquidCrystal_I2C *lcd;
-	std::map<int, std::string> stateLookupTable;
 };

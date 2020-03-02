@@ -51,17 +51,29 @@ int Crutch::getCurrentMotion()
 }
 int Crutch::getCurrentState()
 {
-    // currState =CO_OD_RAM.currentState;
     return currState;
 }
+// void Crutch::setCurrentState()
+// {
+//     currState = CO_OD_RAM.currentState;
+// }
 // TESTING LCD
 void Crutch::setCurrentState(int state)
 {
-    nextMove = state;
+    // currState = CO_OD_RAM.currentState;
+    currState = state;
 }
 void Crutch::incrementCount()
 {
     counter++;
+}
+// TEST BBB OD
+void Crutch::testOD()
+{
+    // setCurrentState();
+    std::cout << "Current state" << lcd->stateLookupTable[getCurrentState()] << std::endl;
+    // TEST CURRENT MOTION
+    // std::cout << "Current MOTION" << lcd->stateLookupTable[getCurrentMotion()] << std::endl;
 }
 
 /*Cycle through current state from 1- 10 and back again to test printing to screen CSNM*/

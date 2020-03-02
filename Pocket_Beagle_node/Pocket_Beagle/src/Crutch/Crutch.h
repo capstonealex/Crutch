@@ -48,7 +48,9 @@ public:
     //For Testing w.o. object Dicitonary
     void crutchTest();
     void setCurrentState(int state);
+    // void setCurrentState();
     void incrementCount();
     int counter;
     int stateIndex;
+    void testOD();
 };
