@@ -11,12 +11,6 @@
 
 #include "LCD.h"
 
-class Crutch
-{
-private:
-    /* data */
-	int currState;
-	int nextMove;
 #include <string>
 #include <vector>
 #include <map>
@@ -30,6 +24,8 @@ private:
         {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Stand Up"}};
+    int currState;
+    int nextMove;
 public:
     Crutch(/* args */);
     ~Crutch();
