@@ -44,6 +44,7 @@ void Crutch::setGreenButon(int val)
 }
 int Crutch::getCurrentMotion()
 {
+    currState = OD.;
     return currState;
 }
 int Crutch::getCurrentState()
