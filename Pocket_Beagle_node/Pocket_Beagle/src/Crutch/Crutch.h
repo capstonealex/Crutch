@@ -47,7 +47,6 @@ public:
     int getCurrentState();
     //For Testing w.o. object Dicitonary
     void crutchTest();
-    void setCurrentMotion(int state);
     void setCurrentState(int state);
     void incrementCount();
     int counter;

@@ -38,23 +38,23 @@ void Crutch::setHeartBeat(int val)
 }
 void Crutch::setNextMotion(int val)
 {
+    // CO_OD_RAM.nextMovement = val;
 }
 void Crutch::setGreenButon(int val)
 {
+    // CO_OD_RAM.goButton = val;
 }
 int Crutch::getCurrentMotion()
 {
-    currState = OD.;
+    // retrun CO_OD_RAM.currentMotion;
     return currState;
 }
 int Crutch::getCurrentState()
 {
-    return nextMove;
+    // currState =CO_OD_RAM.currentState;
+    return currState;
 }
-void Crutch::setCurrentMotion(int motion)
-{
-    currState = motion;
-}
+// TESTING LCD
 void Crutch::setCurrentState(int state)
 {
     nextMove = state;
@@ -63,7 +63,8 @@ void Crutch::incrementCount()
 {
     counter++;
 }
-/*Cycle through current state from 1- 10 and back again for print CSNM*/
+
+/*Cycle through current state from 1- 10 and back again to test printing to screen CSNM*/
 void Crutch::crutchTest()
 {
     if (counter % 50 == 0)
