@@ -25,13 +25,17 @@ void Crutch::run()
 
 void Crutch::printCSNM()
 {
-    lcd->setCurrState(this->currState);
-    lcd->printCurrState();
-    lcd->setNextMove(nextMove);
-    lcd->printNextMove();
+    if (currState != lastState)
+    {
+        lcd->setCurrState(this->currState);
+        lcd->printCurrState();
+        lcd->setNextMove(nextMove);
+        lcd->printNextMove();
+        lastState = currState;
+    }
 
-    std::string name = nextMotion[RIGHT_FORWARD][3];
-    std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << intLookupTable[name] << std::endl;
+    // std::string name = nextMotion[RIGHT_FORWARD][3];
+    // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << intLookupTable[name] << std::endl;
 }
 void Crutch::setHeartBeat(int val)
 {

@@ -25,6 +25,7 @@ private:
         {"Stand Up"}};
     /* data */
     int currState;
+    int lastState;
     int nextMove;
 
 public:

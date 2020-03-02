@@ -57,5 +57,5 @@ void app_programAsync(uint16_t timer1msDiff)
 void app_program1ms(void)
 {
     exoCrutch.run();
-    exo.printCSNM();
+    exoCrutch.printCSNM();
 }
