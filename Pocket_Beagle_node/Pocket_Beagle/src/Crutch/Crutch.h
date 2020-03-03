@@ -37,8 +37,8 @@ public:
     void initCrutch();
     void printVector(vector<vector<string>> const &mat);
     /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
-    std::map<std::string, int> intLookupTable;
-    std::map<int, std::string> stateLookupTable;
+    std::map<std::string, int> stateToIntODMap;
+    std::map<int, std::string> intToStateODMap;
     void populateDictionary();
     //OD interfaces
     void setHeartBeat(int val);

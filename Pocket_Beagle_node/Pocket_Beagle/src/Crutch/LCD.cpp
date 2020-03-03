@@ -66,13 +66,13 @@ void LCD::setup()
 void LCD::printCurrState()
 {
 	clearCurrState();
-	printStr(stateLookupTable[currState], 3, 0);
+	printStr(intToStateODMap[currState], 3, 0);
 }
 
 void LCD::printNextMove()
 {
 	clearNextMove();
-	printStr(stateLookupTable[nextMove], 3, 1);
+	printStr(intToStateODMap[nextMove], 3, 1);
 }
 
 void LCD::clearCurrState()
@@ -127,14 +127,14 @@ void LCD::flash()
 void LCD::populateMap()
 {
 	//TODO: add maps from integer to name of state/move
-	stateLookupTable[1] = "normal";
-	stateLookupTable[2] = "backstep";
-	stateLookupTable[3] = "feet together";
-	stateLookupTable[4] = "up stairs";
-	stateLookupTable[5] = "down stairs";
-	stateLookupTable[6] = "up slope";
-	stateLookupTable[7] = "down slope";
-	stateLookupTable[8] = "uneven";
-	stateLookupTable[9] = "Sit Down";
-	stateLookupTable[10] = "Stand Up";
+	intToStateODMap[1] = "normal";
+	intToStateODMap[2] = "backstep";
+	intToStateODMap[3] = "feet together";
+	intToStateODMap[4] = "up stairs";
+	intToStateODMap[5] = "down stairs";
+	intToStateODMap[6] = "up slope";
+	intToStateODMap[7] = "down slope";
+	intToStateODMap[8] = "uneven";
+	intToStateODMap[9] = "Sit Down";
+	intToStateODMap[10] = "Stand Up";
 }

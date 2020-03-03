@@ -28,7 +28,7 @@ public:
 	void setNextMove(int nm);
 	void flash();
 	void populateMap();
-	std::map<int, std::string> stateLookupTable;
+	std::map<int, std::string> intToStateODMap;
 
 private:
 	int currState;

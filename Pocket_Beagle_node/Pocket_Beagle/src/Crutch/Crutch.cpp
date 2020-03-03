@@ -35,7 +35,7 @@ void Crutch::printCSNM()
     }
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];
-    // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << intLookupTable[name] << std::endl;
+    // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << stateToIntODMap[name] << std::endl;
 }
 void Crutch::setHeartBeat(int val)
 {
@@ -75,9 +75,9 @@ void Crutch::incrementCount()
 void Crutch::testOD()
 {
     // setCurrentState();
-    std::cout << "Current state" << lcd->stateLookupTable[getCurrentState()] << std::endl;
+    std::cout << "Current state" << lcd->intToStateODMap[getCurrentState()] << std::endl;
     // TEST CURRENT MOTION
-    // std::cout << "Current MOTION" << lcd->stateLookupTable[getCurrentMotion()] << std::endl;
+    // std::cout << "Current MOTION" << lcd->intToStateODMap[getCurrentMotion()] << std::endl;
 }
 
 /*Cycle through current state from 1- 10 and back again to test printing to screen CSNM*/
@@ -107,27 +107,29 @@ void Crutch::printVector(vector<vector<string>> const &mat)
 }
 void Crutch::populateDictionary()
 {
-    intLookupTable["normal"] = 1;
-    intLookupTable["backstep"] = 2;
-    intLookupTable["feet together"] = 3;
-    intLookupTable["up stairs"] = 4;
-    intLookupTable["down stairs"] = 5;
-    intLookupTable["up slope"] = 6;
-    intLookupTable["down slope"] = 7;
-    intLookupTable["uneven"] = 8;
-    intLookupTable["Sit Down"] = 9;
-    intLookupTable["Stand Up"] = 10;
+    stateToIntODMap["normal"] = 1;
+    stateToIntODMap["backstep"] = 2;
+    stateToIntODMap["feet together"] = 3;
+    stateToIntODMap["up stairs"] = 4;
+    stateToIntODMap["down stairs"] = 5;
+    stateToIntODMap["up slope"] = 6;
+    stateToIntODMap["down slope"] = 7;
+    stateToIntODMap["uneven"] = 8;
+    stateToIntODMap["Sit Down"] = 9;
+    stateToIntODMap["Stand Up"] = 10;
+    stateToIntODMap["Error"] = 11;
 
-    // stateLookupTable[1] = "normal";
-    // stateLookupTable[2] = "backstep";
-    // stateLookupTable[3] = "feet together";
-    // stateLookupTable[4] = "up stairs";
-    // stateLookupTable[5] = "down stairs";
-    // stateLookupTable[6] = "up slope";
-    // stateLookupTable[7] = "down slope";
-    // stateLookupTable[8] = "uneven";
-    // stateLookupTable[9] = "Sit Down";
-    // stateLookupTable[10] = "Stand Up";
+    intToStateODMap[1] = "normal";
+    intToStateODMap[2] = "backstep";
+    intToStateODMap[3] = "feet together";
+    intToStateODMap[4] = "up stairs";
+    intToStateODMap[5] = "down stairs";
+    intToStateODMap[6] = "up slope";
+    intToStateODMap[7] = "down slope";
+    intToStateODMap[8] = "uneven";
+    intToStateODMap[9] = "Sit Down";
+    intToStateODMap[10] = "Stand Up";
+    intToStateODMap[11] = "Error";
 
     std::cout << "Dictionary populated" << std::endl;
 }
