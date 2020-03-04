@@ -33,7 +33,6 @@ LCD::~LCD()
 	lcd->clear();
 	lcd->noCursor();
 	lcd->noBacklight();
-	lcd->noBlink();
 	lcd->noDisplay();
 	delete lcd;
 	std::cout << "LCD object deleted" << std::endl;
