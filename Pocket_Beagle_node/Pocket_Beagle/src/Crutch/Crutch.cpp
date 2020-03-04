@@ -8,6 +8,7 @@
 #include <fstream>
 #include <algorithm>
 
+
 Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
@@ -25,33 +26,64 @@ Crutch::~Crutch()
 
 void Crutch::run()
 {
+    currState = CO_OD_RAM.currentState;
+    
     incrementCount();
-    crutchTest();
+    updateButtons();
+    //crutchTest();
+    // If current State is a stationary State
+    if (isStationaryState(currState))
+    {
+        //printf("true \n");
+        // Cycle forward with debounce
+        if (nextBut && !prevNextBut)
+        {
+            nextMove = nextMove + 1;
+        }
+        if (lastBut && !prevLastBut)
+        {
+            nextMove = nextMove - 1;
+        }
+        prevNextBut = nextBut;
+        prevLastBut = lastBut;
+        
+        // Check if the Go Button has been pressed
+        if (goBut)
+        {
+            if(nextMove == CO_OD_RAM.currentMovement)
+            {
+                CO_OD_RAM.goButton = goBut;
+            } else
+            {
+                CO_OD_RAM.nextMovement = nextMove;
+            }
+        }
+    } else{
+        // Just step through movement
+        CO_OD_RAM.goButton = goBut;
+    }
 }
 
 void Crutch::printCSNM()
 {
+    
     if (currState != lastState)
     {
         //lcd->setCurrState(this->currState);
         //lcd->printCurrState();
-        //lcd->setNextMove(nextMove);
-        //lcd->printNextMove();
+        printf("Curr State: %d\n", currState);
         lastState = currState;
     }
-    printf("Test: %d \n", CO_OD_RAM.currentState);
+    //printf("Test: %d \n", CO_OD_RAM.currentState);
     
-    char value;
-    char path[] = "/sys/class/gpio/gpio59/value";
-      std::ifstream stream(path);
-      stream >> value;
-      stream.close();
-      
-      if(value != '1')
-      {
-          CO_OD_RAM.nextMovement = CO_OD_RAM.nextMovement+1;
-      } 
-    
+    if (nextMove != lastNextMove){
+        //lcd->setNextMove(nextMove);
+        //lcd->printNextMove();
+        printf("Next Move: %d\n", nextMove);
+        lastNextMove = nextMove;
+    }
+ 
+
     // std::string name = nextMotion[RIGHT_FORWARD][3];
     // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << stateToIntODMap[name] << std::endl;
 }
@@ -151,3 +183,36 @@ void Crutch::populateDictionary()
 
     std::cout << "Dictionary populated" << std::endl;
 }
+
+int Crutch::isStationaryState(int state){
+    // TODO : Needs to have proper definition of states....
+    return 1;
+}
+
+
+void Crutch::updateButtons()
+{
+    nextBut = checkButton(nextButPath);
+    lastBut = checkButton(lastButPath);    
+    goBut = checkButton(goButPath);
+}
+
+
+int Crutch::checkButton(char path[])
+{
+    char value;
+    std::ifstream stream(path);
+    stream >> value;
+    stream.close();
+  
+    if(value != '1')
+    {
+        //printf("%s", path);
+        return 1;
+        //CO_OD_RAM.nextMovement = CO_OD_RAM.nextMovement+1;
+    } else
+    {
+        return 0;
+    }
+}
+
