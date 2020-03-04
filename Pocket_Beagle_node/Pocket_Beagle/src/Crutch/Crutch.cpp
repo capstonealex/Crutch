@@ -9,7 +9,6 @@ Crutch::Crutch(/* args */)
     lcd = new LCD();
     lcd->setup();
     populateDictionary();
-
 }
 
 Crutch::~Crutch()

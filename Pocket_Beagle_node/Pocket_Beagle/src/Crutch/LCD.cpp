@@ -51,13 +51,11 @@ void LCD::printStr(std::string str, uint8_t col, uint8_t row){
 }
 
 void LCD::setup(){
+	lcd->clear();
+	usleep(2000);
 	lcd->backlight();
-	lcd->cursor();
-	lcd->setCursor(0,0);
-	printStr("CS:");
-	lcd->setCursor(0,1);
-	printStr("NM:");
-	lcd->noCursor();
+	printStr("CS:", 0, 0);
+	printStr("NM:", 0, 1);
 }
 
 void LCD::printCurrState(){
@@ -114,7 +112,6 @@ void LCD::populateMap(){
 	//TODO: add maps from integer to name of state/move
 	//intToName[] = ;
 }
-
 
 
 
