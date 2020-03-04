@@ -10,8 +10,8 @@
 #include <map>
 #include <inttypes.h>
 
-
-class LCD {
+class LCD
+{
 public:
 	LCD();
 	virtual ~LCD();
@@ -28,12 +28,10 @@ public:
 	void setNextMove(int nm);
 	void flash();
 	void populateMap();
+	std::map<int, std::string> intToStateODMap;
+
 private:
 	int currState;
 	int nextMove;
 	LiquidCrystal_I2C *lcd;
-	std::map<int, std::string> intToName;
 };
-
-
-
