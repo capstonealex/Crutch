@@ -1,19 +1,20 @@
 #include "Crutch.h"
 #include <iostream>
 #include <unistd.h>
+#include "CANopen.h"
 
 Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
-    lcd = new LCD();
-    lcd->setup();
+    //lcd = new LCD();
+    //lcd->setup();
     populateDictionary();
 }
 
 Crutch::~Crutch()
 {
-    lcd->~LCD();
+    //lcd->~LCD();
     std::cout << "Crutch object deleted" << std::endl;
 }
 
@@ -27,13 +28,14 @@ void Crutch::printCSNM()
 {
     if (currState != lastState)
     {
-        lcd->setCurrState(this->currState);
-        lcd->printCurrState();
-        lcd->setNextMove(nextMove);
-        lcd->printNextMove();
+        //lcd->setCurrState(this->currState);
+        //lcd->printCurrState();
+        //lcd->setNextMove(nextMove);
+        //lcd->printNextMove();
         lastState = currState;
     }
-
+    printf("Test: %d \n", CO_OD_RAM.currentState);
+    CO_OD_RAM.nextMovement = 2;
     // std::string name = nextMotion[RIGHT_FORWARD][3];
     // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << stateToIntODMap[name] << std::endl;
 }

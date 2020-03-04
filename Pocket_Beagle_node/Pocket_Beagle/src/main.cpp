@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     bool_t rebootEnable = false;  /* Configurable by arguments */
 
     /*set up command line arguments as variables*/
-    char CANdevice[10] = "vcan0"; /* change to can1 for bbb vcan0 for virtual can*/
+    char CANdevice[10] = "can0"; /* change to can1 for bbb vcan0 for virtual can*/
     nodeId = NODEID;
     CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */
