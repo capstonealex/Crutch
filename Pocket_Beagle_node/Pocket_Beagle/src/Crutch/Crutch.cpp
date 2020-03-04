@@ -27,7 +27,7 @@ void Crutch::printCSNM()
 {
     if (currState != lastState)
     {
-        lcd->setCurrState(this->currState);
+        lcd->setCurrState(currState);
         lcd->printCurrState();
         lcd->setNextMove(nextMove);
         lcd->printNextMove();

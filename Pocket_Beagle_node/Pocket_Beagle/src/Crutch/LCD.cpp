@@ -15,9 +15,9 @@
 #define LCD_ADDR 0x20
 #define LCD_COLS 16
 #define LCD_ROWS 2
-#define I2C_BUS 2 // NB: Bus 2 is on port 1 on PB
-#define PIN1 26   //NB: on port 1 (i2c bus 2) of PB
-#define PIN2 28   //NB: on port 1 (i2c bus 2) of PB
+#define I2C_BUS 1 // NB: Bus 2 is on port 1 on PB
+#define PIN1 9   //NB: on port 1 (i2c bus 2) of PB
+#define PIN2 11   //NB: on port 1 (i2c bus 2) of PB
 
 LCD::LCD()
 {
@@ -34,6 +34,7 @@ LCD::~LCD()
 	lcd->noCursor();
 	lcd->noBacklight();
 	lcd->noDisplay();
+	lcd->i2c_close(lcd->getHandle());
 	delete lcd;
 	std::cout << "LCD object deleted" << std::endl;
 }
@@ -53,8 +54,6 @@ void LCD::printStr(std::string str, uint8_t col, uint8_t row)
 
 void LCD::setup()
 {
-	lcd->clear();
-	usleep(2000);
 	lcd->backlight();
 	printStr("CS:", 0, 0);
 	printStr("NM:", 0, 1);
