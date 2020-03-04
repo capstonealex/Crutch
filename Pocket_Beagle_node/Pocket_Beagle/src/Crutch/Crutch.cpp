@@ -3,6 +3,11 @@
 #include <unistd.h>
 #include "CANopen.h"
 
+#include <fcntl.h>
+#include <sys/epoll.h>
+#include <fstream>
+#include <algorithm>
+
 Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
@@ -35,7 +40,18 @@ void Crutch::printCSNM()
         lastState = currState;
     }
     printf("Test: %d \n", CO_OD_RAM.currentState);
-    CO_OD_RAM.nextMovement = 2;
+    
+    char value;
+    char path[] = "/sys/class/gpio/gpio59/value";
+      std::ifstream stream(path);
+      stream >> value;
+      stream.close();
+      
+      if(value != '1')
+      {
+          CO_OD_RAM.nextMovement = CO_OD_RAM.nextMovement+1;
+      } 
+    
     // std::string name = nextMotion[RIGHT_FORWARD][3];
     // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << stateToIntODMap[name] << std::endl;
 }
