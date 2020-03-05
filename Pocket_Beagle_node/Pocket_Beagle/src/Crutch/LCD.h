@@ -29,6 +29,7 @@ public:
 	void flash();
 	void populateMap();
 	std::map<int, std::string> intToStateODMap;
+	std::map<int, std::string> intToMvmntODMap;
 
 private:
 	int currState;

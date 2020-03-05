@@ -16,7 +16,7 @@
 #define LCD_COLS 16
 #define LCD_ROWS 2
 #define I2C_BUS 1 // NB: Bus 2 is on port 1 on PB
-#define PIN1 9   //NB: on port 1 (i2c bus 2) of PB
+#define PIN1 9	//NB: on port 1 (i2c bus 2) of PB
 #define PIN2 11   //NB: on port 1 (i2c bus 2) of PB
 
 LCD::LCD()
@@ -68,7 +68,7 @@ void LCD::printCurrState()
 void LCD::printNextMove()
 {
 	clearNextMove();
-	printStr(intToStateODMap[nextMove], 3, 1);
+	printStr(intToMvmntODMap[nextMove], 3, 1);
 }
 
 void LCD::clearCurrState()
@@ -122,47 +122,30 @@ void LCD::flash()
 
 void LCD::populateMap()
 {
-	//TODO: add maps from integer to name of state/move
-	intToStateODMap[1] = "normal";
-	intToStateODMap[2] = "backstep";
-	intToStateODMap[3] = "feet together";
-	intToStateODMap[4] = "up stairs";
-	intToStateODMap[5] = "down stairs";
-	intToStateODMap[6] = "up slope";
-	intToStateODMap[7] = "down slope";
-	intToStateODMap[8] = "uneven";
-	intToStateODMap[9] = "Sit Down";
-	intToStateODMap[10] = "Stand Up";
+
+	intToMvmntODMap[1] = "normal";
+	intToMvmntODMap[2] = "up stairs";
+	intToMvmntODMap[3] = "down stairs";
+	intToMvmntODMap[4] = "up slope";
+	intToMvmntODMap[5] = "down slope";
+	intToMvmntODMap[6] = "feet together";
+	intToMvmntODMap[7] = "backstep";
+	intToMvmntODMap[8] = "sit Down";
+	intToMvmntODMap[9] = "stand Up";
+	intToMvmntODMap[10] = "uneven";
+
+	intToStateODMap[1] = "Error";
+	intToStateODMap[2] = "Init";
+	intToStateODMap[3] = "Left Forward";
+	intToStateODMap[4] = "Right Forward";
+	intToStateODMap[5] = "Standing";
+	intToStateODMap[6] = "Sitting";
+	intToStateODMap[7] = "Sitting Down";
+	intToStateODMap[8] = "Standing Up";
+	intToStateODMap[9] = "Step 1st L";
+	intToStateODMap[10] = "Step 1st R";
+	intToStateODMap[11] = "Step last L";
+	intToStateODMap[12] = "Step last R";
+	intToStateODMap[13] = "Step L";
+	intToStateODMap[14] = "Step R";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

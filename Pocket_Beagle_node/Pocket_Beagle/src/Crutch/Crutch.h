@@ -18,8 +18,8 @@ class Crutch
 {
 private:
     /* Jagged array for Current state, next motion relationship */
+    // walking, standing and sitting
     vector<vector<string>> nextMotion{
-        {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Stand Up"}};
@@ -28,8 +28,7 @@ private:
     int lastState;
     int nextMove;
     int lastNextMove;
-    
-    
+
     // Button Variables
     int nextBut;
     int prevNextBut;
@@ -71,5 +70,4 @@ public:
     int counter;
     int stateIndex;
     void testOD();
-
 };
