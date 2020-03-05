@@ -13,14 +13,14 @@ Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
-    //lcd = new LCD();
-    //lcd->setup();
+    lcd = new LCD();
+    lcd->setup();
     populateDictionary();
 }
 
 Crutch::~Crutch()
 {
-    //lcd->~LCD();
+    lcd->~LCD();
     std::cout << "Crutch object deleted" << std::endl;
 }
 
@@ -57,11 +57,16 @@ void Crutch::run()
             {
                 CO_OD_RAM.nextMovement = nextMove;
             }
+        } else
+        {
+                CO_OD_RAM.goButton = goBut;
         }
+
     } else{
         // Just step through movement
         CO_OD_RAM.goButton = goBut;
     }
+
 }
 
 void Crutch::printCSNM()
@@ -69,16 +74,16 @@ void Crutch::printCSNM()
     
     if (currState != lastState)
     {
-        //lcd->setCurrState(this->currState);
-        //lcd->printCurrState();
+        lcd->setCurrState(this->currState);
+        lcd->printCurrState();
         printf("Curr State: %d\n", currState);
         lastState = currState;
     }
     //printf("Test: %d \n", CO_OD_RAM.currentState);
     
     if (nextMove != lastNextMove){
-        //lcd->setNextMove(nextMove);
-        //lcd->printNextMove();
+        lcd->setNextMove(nextMove);
+        lcd->printNextMove();
         printf("Next Move: %d\n", nextMove);
         lastNextMove = nextMove;
     }

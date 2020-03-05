@@ -22,7 +22,7 @@
 LCD::LCD()
 {
 	lcd = new LiquidCrystal_I2C(LCD_ADDR, LCD_COLS, LCD_ROWS, I2C_BUS);
-	lcd->configure_i2c_pins(PIN1, PIN2);
+	//lcd->configure_i2c_pins(PIN1, PIN2);
 	lcd->init();
 	populateMap();
 	std::cout << "LCD object created" << std::endl;
