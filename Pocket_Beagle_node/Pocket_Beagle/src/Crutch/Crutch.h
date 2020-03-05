@@ -18,10 +18,10 @@ class Crutch
 {
 private:
     /* Jagged array for Current state, next motion relationship */
-    // walking, standing and sitting
+    // walking, standing and sitting w/ their Next motion lists
     vector<vector<string>> nextMotion{
         {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
-        {"Sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
+        {"sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
         {"Stand Up"}};
     /* data */
     int currState;
