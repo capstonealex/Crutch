@@ -27,6 +27,23 @@ private:
     int currState;
     int lastState;
     int nextMove;
+    int lastNextMove;
+    
+    
+    // Button Variables
+    int nextBut;
+    int prevNextBut;
+    int lastBut;
+    int prevLastBut;
+    int goBut;
+
+    char nextButPath[50] = "/sys/class/gpio/gpio59/value";
+    char lastButPath[50] = "/sys/class/gpio/gpio58/value";
+    char goButPath[50] = "/sys/class/gpio/gpio57/value";
+
+    void updateButtons();
+    int checkButton(char path[]);
+    int isStationaryState(int state);
 
 public:
     Crutch(/* args */);
@@ -54,4 +71,5 @@ public:
     int counter;
     int stateIndex;
     void testOD();
+
 };
