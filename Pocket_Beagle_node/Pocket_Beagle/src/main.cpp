@@ -317,24 +317,6 @@ int main(int argc, char *argv[])
                 if (pthread_setschedparam(rt_thread_id, SCHED_FIFO, &paramc) != 0)
                     CO_errExit("Program init - rt_thread set scheduler failed");
             }
-
-            /*Create rthreads w. priority b4 creation*/
-            // pthread_attr_t my_attr;
-            // struct sched_param param, paramcontrol;
-            // /* Initialize thread schedule policies and declare priority value*/
-            // pthread_attr_init(&my_attr);
-            // pthread_attr_setschedpolicy(&my_attr, SCHED_FIFO);
-            // param.sched_priority = rtPriority;
-            // paramcontrol.sched_priority = rtControlPriority;
-            // /*Set priority and create each thread*/
-            // /* Create rt_thread */
-            // pthread_attr_setschedpolicy(&my_attr, param.sched_priority);
-            // if (pthread_create(&rt_thread_id, &my_attr, rt_thread, NULL) != 0)
-            //     CO_errExit("Program init - rt_thread creation failed");
-            // /* Create rt control loop thread*/
-            // pthread_attr_setschedpolicy(&my_attr, paramcontrol.sched_priority);
-            // // if (pthread_create(&rt_control_thread_id, &my_attr, rt_control_thread, NULL) != 0)
-            //     CO_errExit("Program init - rt_control_thread creation failed");
         }
 
         /* start CAN */
@@ -380,16 +362,6 @@ int main(int argc, char *argv[])
                 uint32_t timer1msDiff;
                 timer1msDiff = CO_timer1ms - tmr1msPrev;
                 tmr1msPrev = CO_timer1ms;
-
-                // printf("Abs Time: %d, Diff Time: %d\n", CO_timer1ms, timer1msDiff);
-
-                /* Execute optional additional alication code */
-                // Update loop counter -> Can run in Async or RT thread for faster execution.
-
-                // sitStandMachine.hwStateUpdate();
-                // sitStandMachine.update();
-                // app_programAsync(timer1msDiff);
-
                 CO_OD_storage_autoSave(&odStorAuto, CO_timer1ms, 60000);
             }
 

@@ -58,6 +58,5 @@ void app_program1ms(void)
 {
 
     exoCrutch.run();
-    
     exoCrutch.printCSNM();
 }
