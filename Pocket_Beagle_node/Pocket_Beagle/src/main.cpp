@@ -53,7 +53,7 @@
 #define TMR_TASK_INTERVAL_NS (1000000) /* Interval of taskTmr in nanoseconds */
 #define TMR_TASK_OVERFLOW_US (5000)    /* Overflow detect limit for taskTmr in microseconds */
 #define INCREMENT_1MS(var) (var++)     /* Increment 1ms variable in taskTmr */
-#define NODEID (100)
+#define NODEID (101)
 #define CANMESSAGELENGTH (100)
 
 /* Global variable increments each millisecond. */
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     bool_t rebootEnable = false;  /* Configurable by arguments */
 
     /*set up command line arguments as variables*/
-    char CANdevice[10] = "vcan0"; /* change to can1 for bbb vcan0 for virtual can*/
+    char CANdevice[10] = "can0"; /* change to can1 for bbb vcan0 for virtual can*/
     nodeId = NODEID;
     CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */
