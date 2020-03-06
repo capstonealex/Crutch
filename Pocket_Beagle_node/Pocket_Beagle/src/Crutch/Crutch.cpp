@@ -14,7 +14,7 @@ Crutch::Crutch(/* args */)
     std::cout << "Crutch object created" << std::endl;
 
     lcd = new LCD();
-    lcd->setup();
+   // lcd->setup();
     populateDictionary();
 }
 
@@ -38,11 +38,16 @@ void Crutch::run()
         // Cycle forward with debounce
         if (nextBut && !prevNextBut)
         {
-            nextMove = nextMove + 1;
+            nextMove = nextMove%11 + 1;
         }
         if (lastBut && !prevLastBut)
         {
-            nextMove = nextMove - 1;
+            if (nextMove <=1)
+            {
+                nextMove = 11;
+            } else {
+                nextMove = nextMove -1;
+            }
         }
         prevNextBut = nextBut;
         prevLastBut = lastBut;
@@ -74,17 +79,17 @@ void Crutch::printCSNM()
     
     if (currState != lastState)
     {
-        lcd->setCurrState(this->currState);
-        lcd->printCurrState();
-        printf("Curr State: %d\n", currState);
+     //   lcd->setCurrState(this->currState);
+     //   lcd->printCurrState();
+        std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
         lastState = currState;
     }
     //printf("Test: %d \n", CO_OD_RAM.currentState);
     
     if (nextMove != lastNextMove){
-        lcd->setNextMove(nextMove);
-        lcd->printNextMove();
-        printf("Next Move: %d\n", nextMove);
+     //   lcd->setNextMove(nextMove);
+     //   lcd->printNextMove();
+        std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
         lastNextMove = nextMove;
     }
  
@@ -190,8 +195,12 @@ void Crutch::populateDictionary()
 }
 
 int Crutch::isStationaryState(int state){
-    // TODO : Needs to have proper definition of states....
-    return 1;
+    if (state >= 7) 
+    {
+        return 0;
+    } else{
+        return 1;
+    }
 }
 
 
