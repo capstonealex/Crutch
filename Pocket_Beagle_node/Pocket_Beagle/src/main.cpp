@@ -422,7 +422,6 @@ static void *rt_thread(void *arg)
     /* Endless loop */
     while (CO_endProgram == 0)
     {
-        // std::cout << "2.PROCESS MESSAGE THREAD\n";
         int ready;
         struct epoll_event ev;
 
@@ -441,7 +440,6 @@ static void *rt_thread(void *arg)
 
             /* code was processed in the above function. Additional code process below */
             INCREMENT_1MS(CO_timer1ms);
-
             /* Monitor variables with trace objects */
             CO_time_process(&CO_time);
 #if CO_NO_TRACE > 0
@@ -458,7 +456,7 @@ static void *rt_thread(void *arg)
             if (OD_performance[ODA_performance_timerCycleMaxTime] > TMR_TASK_OVERFLOW_US && rtPriority > 0 && CO->CANmodule[0]->CANnormal)
             {
                 CO_errorReport(CO->em, CO_EM_ISR_TIMER_OVERFLOW, CO_EMC_SOFTWARE_INTERNAL, 0x22400000L | OD_performance[ODA_performance_timerCycleMaxTime]);
-                //printf("Timer large overflow \n");
+                printf("Timer large overflow \n");
             }
         }
 
