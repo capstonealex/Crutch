@@ -40,7 +40,7 @@ OBJS = $(SOURCES:%.c=%.o) $(CPPSOURCES:%.cpp=%.o)
 #CFLAGS =  -std=c++11  -g $(INCLUDE_DIRS)
 #LDFLAGS = -lrt -pthread
 
-CC = arm-linux-gnueabihf-gcc
+#CC = arm-linux-gnueabihf-gcc
 CXX = arm-linux-gnueabihf-g++
 CXXFLAGS = -I./src/lib -std=c++11 $(INCLUDE_DIRS)
 LDFLAGS = -lpthread -L./src/lib -lLiquidCrystal_I2C

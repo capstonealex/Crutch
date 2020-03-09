@@ -8,13 +8,12 @@
 #include <fstream>
 #include <algorithm>
 
-
 Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
     lcd = new LCD();
-   // lcd->setup();
+    // lcd->setup();
     populateDictionary();
 }
 
@@ -27,7 +26,7 @@ Crutch::~Crutch()
 void Crutch::run()
 {
     currState = CO_OD_RAM.currentState;
-    
+
     incrementCount();
     updateButtons();
     //crutchTest();
@@ -38,61 +37,65 @@ void Crutch::run()
         // Cycle forward with debounce
         if (nextBut && !prevNextBut)
         {
-            nextMove = nextMove%11 + 1;
+            nextMove = nextMove % 11 + 1;
         }
         if (lastBut && !prevLastBut)
         {
-            if (nextMove <=1)
+            if (nextMove <= 1)
             {
                 nextMove = 11;
-            } else {
-                nextMove = nextMove -1;
+            }
+            else
+            {
+                nextMove = nextMove - 1;
             }
         }
         prevNextBut = nextBut;
         prevLastBut = lastBut;
-        
+
         // Check if the Go Button has been pressed
         if (goBut)
         {
-            if(nextMove == CO_OD_RAM.currentMovement)
+            if (nextMove == CO_OD_RAM.currentMovement)
             {
                 CO_OD_RAM.goButton = goBut;
-            } else
+            }
+            else
             {
                 CO_OD_RAM.nextMovement = nextMove;
             }
-        } else
-        {
-                CO_OD_RAM.goButton = goBut;
         }
-
-    } else{
+        else
+        {
+            CO_OD_RAM.goButton = goBut;
+        }
+    }
+    else
+    {
         // Just step through movement
         CO_OD_RAM.goButton = goBut;
     }
-
 }
 
 void Crutch::printCSNM()
 {
-    
+
     if (currState != lastState)
     {
-     //   lcd->setCurrState(this->currState);
-     //   lcd->printCurrState();
+        //   lcd->setCurrState(this->currState);
+        //   lcd->printCurrState();
         std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
         lastState = currState;
     }
     //printf("Test: %d \n", CO_OD_RAM.currentState);
-    
-    if (nextMove != lastNextMove){
-     //   lcd->setNextMove(nextMove);
-     //   lcd->printNextMove();
+
+    if (nextMove != lastNextMove)
+    {
+        //   lcd->setNextMove(nextMove);
+        //   lcd->printNextMove();
         std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
         lastNextMove = nextMove;
     }
- 
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];
     // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << stateToIntODMap[name] << std::endl;
@@ -154,11 +157,11 @@ void Crutch::crutchTest()
     }
 }
 
-void Crutch::printVector(vector<vector<string>> const &mat)
+void Crutch::printVector(vector<vector<std::string>> const &mat)
 {
-    for (vector<string> row : mat)
+    for (vector<std::string> row : mat)
     {
-        for (string val : row)
+        for (std::string val : row)
         {
             cout << val << " ";
         }
@@ -194,39 +197,40 @@ void Crutch::populateDictionary()
     std::cout << "Dictionary populated" << std::endl;
 }
 
-int Crutch::isStationaryState(int state){
-    if (state >= 7) 
+int Crutch::isStationaryState(int state)
+{
+    if (state >= 7)
     {
         return 0;
-    } else{
+    }
+    else
+    {
         return 1;
     }
 }
 
-
 void Crutch::updateButtons()
 {
     nextBut = checkButton(nextButPath);
-    lastBut = checkButton(lastButPath);    
+    lastBut = checkButton(lastButPath);
     goBut = checkButton(goButPath);
 }
 
-
-int Crutch::checkButton(char path[])
+int Crutch::checkButton(std::string path)
 {
     char value;
     std::ifstream stream(path);
     stream >> value;
     stream.close();
-  
-    if(value != '1')
+
+    if (value != '1')
     {
         //printf("%s", path);
         return 1;
         //CO_OD_RAM.nextMovement = CO_OD_RAM.nextMovement+1;
-    } else
+    }
+    else
     {
         return 0;
     }
 }
-

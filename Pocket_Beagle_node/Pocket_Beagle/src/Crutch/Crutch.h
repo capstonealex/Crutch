@@ -13,16 +13,17 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <string>
 using namespace std;
 class Crutch
 {
 private:
     /* Jagged array for Current state, next motion relationship */
     // walking, standing and sitting w/ their Next motion lists
-    vector<vector<string>> nextMotion{
-        {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
-        {"sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
-        {"Stand Up"}};
+    // vector<vector<std::string>> nextMotion{
+    //     {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
+    //     {"sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
+    //     {"Stand Up"}};
     /* data */
     int currState;
     int lastState;
@@ -36,12 +37,12 @@ private:
     int prevLastBut;
     int goBut;
 
-    char nextButPath[50] = "/sys/class/gpio/gpio59/value";
-    char lastButPath[50] = "/sys/class/gpio/gpio58/value";
-    char goButPath[50] = "/sys/class/gpio/gpio57/value";
+    std::string nextButPath = "/sys/class/gpio/gpio59/value";
+    std::string lastButPath = "/sys/class/gpio/gpio58/value";
+    std::string goButPath = "/sys/class/gpio/gpio57/value";
 
     void updateButtons();
-    int checkButton(char path[]);
+    int checkButton(std::string path);
     int isStationaryState(int state);
 
 public:
@@ -51,7 +52,7 @@ public:
     void printCSNM();
     LCD *lcd;
     void initCrutch();
-    void printVector(vector<vector<string>> const &mat);
+    void printVector(vector<vector<std::string>> const &mat);
     /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
     std::map<std::string, int> stateToIntODMap;
     std::map<int, std::string> intToStateODMap;
