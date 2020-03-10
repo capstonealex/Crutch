@@ -2,7 +2,6 @@
 #include <iostream>
 #include <unistd.h>
 #include "CANopen.h"
-
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <fstream>
@@ -12,8 +11,8 @@ Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
-    lcd = new LCD();
-    lcd->setup();
+    // lcd = new LCD();
+    // lcd->setup();
     populateDictionary();
 }
 
@@ -23,8 +22,15 @@ Crutch::~Crutch()
     std::cout << "Crutch object deleted" << std::endl;
 }
 
+void Crutch::initCrutch()
+{
+    lcd = new LCD();
+    lcd->setup();
+    lastState = 50;
+}
 void Crutch::run()
 {
+    CO_OD_RAM.currentState = 5;
     currState = CO_OD_RAM.currentState;
 
     incrementCount();
@@ -182,17 +188,20 @@ void Crutch::populateDictionary()
     stateToIntODMap["Stand Up"] = 10;
     stateToIntODMap["Error"] = 11;
 
-    intToStateODMap[1] = "normal";
-    intToStateODMap[2] = "backstep";
-    intToStateODMap[3] = "feet together";
-    intToStateODMap[4] = "up stairs";
-    intToStateODMap[5] = "down stairs";
-    intToStateODMap[6] = "up slope";
-    intToStateODMap[7] = "down slope";
-    intToStateODMap[8] = "uneven";
-    intToStateODMap[9] = "Sit Down";
-    intToStateODMap[10] = "Stand Up";
-    intToStateODMap[11] = "Error";
+    intToStateODMap[1] = "Error";
+    intToStateODMap[2] = "Init";
+    intToStateODMap[3] = "Left Forward";
+    intToStateODMap[4] = "Right Forward";
+    intToStateODMap[5] = "Standing";
+    intToStateODMap[6] = "Sitting";
+    intToStateODMap[7] = "Sitting Down";
+    intToStateODMap[8] = "Standing Up";
+    intToStateODMap[9] = "Step 1st L";
+    intToStateODMap[10] = "Step 1st R";
+    intToStateODMap[11] = "Step last L";
+    intToStateODMap[12] = "Step last R";
+    intToStateODMap[13] = "Step L";
+    intToStateODMap[14] = "Step R";
 
     std::cout << "Dictionary populated" << std::endl;
 }

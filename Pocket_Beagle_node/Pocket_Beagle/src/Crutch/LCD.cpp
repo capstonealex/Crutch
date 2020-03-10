@@ -67,6 +67,7 @@ void LCD::printCurrState()
 
 void LCD::printNextMove()
 {
+	std::cout << "LCD LEVEL NEXT MOVE:" << intToMvmntODMap[nextMove] << std::endl;
 	clearNextMove();
 	printStr(intToMvmntODMap[nextMove], 3, 1);
 }
@@ -123,16 +124,16 @@ void LCD::flash()
 void LCD::populateMap()
 {
 
-	intToMvmntODMap[1] = "normal";
-	intToMvmntODMap[2] = "up stairs";
-	intToMvmntODMap[3] = "down stairs";
-	intToMvmntODMap[4] = "up slope";
-	intToMvmntODMap[5] = "down slope";
-	intToMvmntODMap[6] = "feet together";
-	intToMvmntODMap[7] = "backstep";
-	intToMvmntODMap[8] = "sit Down";
-	intToMvmntODMap[9] = "stand Up";
-	intToMvmntODMap[10] = "uneven";
+	intToMvmntODMap[1] = "Normal";
+	intToMvmntODMap[2] = "Up stair";
+	intToMvmntODMap[3] = "Dwm stair";
+	intToMvmntODMap[4] = "Up slope";
+	intToMvmntODMap[5] = "Dwn slope";
+	intToMvmntODMap[6] = "Ft TG";
+	intToMvmntODMap[7] = "Backstep";
+	intToMvmntODMap[8] = "Sit Dwn";
+	intToMvmntODMap[9] = "Stand Up";
+	intToMvmntODMap[10] = "Uneven";
 
 	intToStateODMap[1] = "Error";
 	intToStateODMap[2] = "Init";

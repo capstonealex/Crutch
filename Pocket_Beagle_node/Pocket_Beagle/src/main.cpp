@@ -362,7 +362,10 @@ int main(int argc, char *argv[])
                 uint32_t timer1msDiff;
                 timer1msDiff = CO_timer1ms - tmr1msPrev;
                 tmr1msPrev = CO_timer1ms;
+                app_programAsync(timer1msDiff);
                 CO_OD_storage_autoSave(&odStorAuto, CO_timer1ms, 60000);
+
+                /* Execute optional additional application code */
             }
 
             else
@@ -453,11 +456,11 @@ static void *rt_thread(void *arg)
             // app_program1ms();
 
             /* Detect timer large overflow */
-            if (OD_performance[ODA_performance_timerCycleMaxTime] > TMR_TASK_OVERFLOW_US && rtPriority > 0 && CO->CANmodule[0]->CANnormal)
-            {
-                CO_errorReport(CO->em, CO_EM_ISR_TIMER_OVERFLOW, CO_EMC_SOFTWARE_INTERNAL, 0x22400000L | OD_performance[ODA_performance_timerCycleMaxTime]);
-                printf("Timer large overflow \n");
-            }
+            // if (OD_performance[ODA_performance_timerCycleMaxTime] > TMR_TASK_OVERFLOW_US && rtPriority > 0 && CO->CANmodule[0]->CANnormal)
+            // {
+            //     CO_errorReport(CO->em, CO_EM_ISR_TIMER_OVERFLOW, CO_EMC_SOFTWARE_INTERNAL, 0x22400000L | OD_performance[ODA_performance_timerCycleMaxTime]);
+            //     printf("Timer large overflow \n");
+            // }
         }
 
         else
@@ -503,7 +506,7 @@ static void inc_period(struct period_info *pinfo)
 static void periodic_task_init(struct period_info *pinfo)
 {
     /* for simplicity, hardcoding a 1ms period */
-    pinfo->period_ns = 20000000;
+    pinfo->period_ns = 100000000;
 
     clock_gettime(CLOCK_MONOTONIC, &(pinfo->next_period));
 }

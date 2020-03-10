@@ -36,6 +36,8 @@ void app_programStart(void)
     // Testing LCD TRANSITIONS
     exoCrutch.stateIndex = 1;
     exoCrutch.setCurrentState(exoCrutch.stateIndex);
+    CO_OD_RAM.currentState = 2;
+    exoCrutch.initCrutch();
 }
 
 /******************************************************************************/
@@ -56,7 +58,6 @@ void app_programAsync(uint16_t timer1msDiff)
 /******************************************************************************/
 void app_program1ms(void)
 {
-
     exoCrutch.run();
     exoCrutch.printCSNM();
 }
