@@ -13,7 +13,7 @@ Crutch::Crutch(/* args */)
     std::cout << "Crutch object created" << std::endl;
 
     lcd = new LCD();
-    // lcd->setup();
+    lcd->setup();
     populateDictionary();
 }
 
@@ -82,8 +82,8 @@ void Crutch::printCSNM()
 
     if (currState != lastState)
     {
-        //   lcd->setCurrState(this->currState);
-        //   lcd->printCurrState();
+        lcd->setCurrState(this->currState);
+        lcd->printCurrState();
         std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
         lastState = currState;
     }
@@ -91,8 +91,8 @@ void Crutch::printCSNM()
 
     if (nextMove != lastNextMove)
     {
-        //   lcd->setNextMove(nextMove);
-        //   lcd->printNextMove();
+        lcd->setNextMove(nextMove);
+        lcd->printNextMove();
         std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
         lastNextMove = nextMove;
     }
