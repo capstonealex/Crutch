@@ -38,6 +38,7 @@ void app_programStart(void)
     exoCrutch.setCurrentState(exoCrutch.stateIndex);
     CO_OD_RAM.currentState = 2;
     exoCrutch.initCrutch();
+    exoCrutch.counter = 0;
 }
 
 /******************************************************************************/
@@ -58,6 +59,10 @@ void app_programAsync(uint16_t timer1msDiff)
 /******************************************************************************/
 void app_program1ms(void)
 {
+    exoCrutch.counter++;
+    std::cout<< exoCrutch.counter;
     exoCrutch.run();
-    exoCrutch.printCSNM();
+    if (exoCrutch->counter %1000000){
+        exoCrutch.printCSNM();
+    }
 }
