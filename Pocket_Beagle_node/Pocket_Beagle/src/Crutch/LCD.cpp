@@ -137,16 +137,16 @@ void LCD::populateMap()
 
 	intToStateODMap[1] = "Error";
 	intToStateODMap[2] = "Init";
-	intToStateODMap[3] = "Left Forward";
-	intToStateODMap[4] = "Right Forward";
+	intToStateODMap[3] = "Left Frwd";
+	intToStateODMap[4] = "Right Frwd";
 	intToStateODMap[5] = "Standing";
 	intToStateODMap[6] = "Sitting";
-	intToStateODMap[7] = "Sitting Down";
-	intToStateODMap[8] = "Standing Up";
-	intToStateODMap[9] = "Step 1st L";
-	intToStateODMap[10] = "Step 1st R";
-	intToStateODMap[11] = "Step last L";
-	intToStateODMap[12] = "Step last R";
+	intToStateODMap[7] = "Sit dWn";
+	intToStateODMap[8] = "Stand Up";
+	intToStateODMap[9] = "1st L";
+	intToStateODMap[10] = "1st R";
+	intToStateODMap[11] = "last L";
+	intToStateODMap[12] = "last R";
 	intToStateODMap[13] = "Step L";
 	intToStateODMap[14] = "Step R";
 }
