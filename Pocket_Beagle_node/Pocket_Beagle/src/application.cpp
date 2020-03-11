@@ -60,9 +60,10 @@ void app_programAsync(uint16_t timer1msDiff)
 void app_program1ms(void)
 {
     exoCrutch.counter++;
-    std::cout<< exoCrutch.counter;
     exoCrutch.run();
-    if (exoCrutch->counter %1000000){
-        exoCrutch.printCSNM();
-    }
+    // if (!((exoCrutch.counter) % 100))
+    // {
+    // std::cout << "printToScreen" << std::endl;
+    exoCrutch.printCSNM();
+    // }
 }

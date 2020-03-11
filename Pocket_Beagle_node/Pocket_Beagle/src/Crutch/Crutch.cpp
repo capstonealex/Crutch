@@ -11,7 +11,7 @@ Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
-    // lcd = new LCD();
+    lcd = new LCD();
     // lcd->setup();
     populateDictionary();
 }
@@ -30,7 +30,6 @@ void Crutch::initCrutch()
 }
 void Crutch::run()
 {
-    CO_OD_RAM.currentState = 5;
     currState = CO_OD_RAM.currentState;
 
     incrementCount();
@@ -88,10 +87,10 @@ void Crutch::printCSNM()
 
     if (currState != lastState)
     {
-        // lcd->setCurrState(this->currState);
-        // lcd->printCurrState();
-        // std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
-        // lastState = currState;
+        lcd->setCurrState(this->currState);
+        lcd->printCurrState();
+        std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
+        lastState = currState;
     }
     //printf("Test: %d \n", CO_OD_RAM.currentState);
 
@@ -101,11 +100,11 @@ void Crutch::printCSNM()
         lcd->printNextMove();
         std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
         lastNextMove = nextMove;
-        // sleep(1);
-        lcd->setCurrState(this->currState);
-        lcd->printCurrState();
-        std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
-        lastState = currState;
+
+        // lcd->setCurrState(this->currState);
+        // lcd->printCurrState();
+        // std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
+        // lastState = currState;
     }
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];

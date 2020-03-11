@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     bool_t rebootEnable = false;  /* Configurable by arguments */
 
     /*set up command line arguments as variables*/
-    char CANdevice[10] = "can0"; /* change to can1 for bbb vcan0 for virtual can*/
+    char CANdevice[10] = "can0"; /* change to can1 for bbb vcan0 for virtual can and can0 for pBeagle*/
     nodeId = NODEID;
     CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */
@@ -459,7 +459,7 @@ static void *rt_thread(void *arg)
             // if (OD_performance[ODA_performance_timerCycleMaxTime] > TMR_TASK_OVERFLOW_US && rtPriority > 0 && CO->CANmodule[0]->CANnormal)
             // {
             //     CO_errorReport(CO->em, CO_EM_ISR_TIMER_OVERFLOW, CO_EMC_SOFTWARE_INTERNAL, 0x22400000L | OD_performance[ODA_performance_timerCycleMaxTime]);
-            //     printf("Timer large overflow \n");
+            //     //printf("Timer large overflow \n");
             // }
         }
 
@@ -505,8 +505,9 @@ static void inc_period(struct period_info *pinfo)
 }
 static void periodic_task_init(struct period_info *pinfo)
 {
-    /* for simplicity, hardcoding a 1ms period */
-    pinfo->period_ns = 1000000;
+    /* Set period to 1ms greater then max allowed Netowkr message timout*/
+    pinfo->period_ns = 6000000;
+    //pinfo->period_ns = 1000000;
 
     clock_gettime(CLOCK_MONOTONIC, &(pinfo->next_period));
 }
