@@ -55,6 +55,7 @@ LiquidCrystal_I2C::LiquidCrystal_I2C(uint8_t lcd_Addr, uint8_t lcd_cols, uint8_t
 	_rows = lcd_rows;
 	_i2c_bus = i2c_bus;
 	_backlightval = LCD_NOBACKLIGHT;
+	_commControl = 0;
 }
 
 void LiquidCrystal_I2C::configure_i2c_pins(char p1, char p2)
@@ -113,7 +114,7 @@ int LiquidCrystal_I2C::i2c_close(int handle)
 
 int LiquidCrystal_I2C::i2c_write_byte(int handle, unsigned char val)
 {
-	if (_rtControl == 0)
+	if (_commControl == 0)
 	{
 		int i = 0;
 		while (write(handle, &val, 1) != 1 && i < 10)
@@ -126,11 +127,12 @@ int LiquidCrystal_I2C::i2c_write_byte(int handle, unsigned char val)
 			return -1;
 		}
 	}
-	else if (_rtControl == 1)
+	else if (_commControl == 1)
 	{
 		unsigned char comm = commandQueue.front();
 		if (comm == 0xff)
 		{
+			commandQueue.pop();
 			return 0;
 		}
 		int i = 0;
@@ -141,6 +143,7 @@ int LiquidCrystal_I2C::i2c_write_byte(int handle, unsigned char val)
 		if (i >= 10)
 		{
 			fprintf(stderr, "i2c_write_byte error: %s\n", strerror(errno));
+			commandQueue.pop();
 			return -1;
 		}
 		commandQueue.pop();
@@ -224,7 +227,7 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
 void LiquidCrystal_I2C::clear()
 {
 	command(LCD_CLEARDISPLAY); // clear display, set cursor position to zero
-	if (_rtControl)
+	if (_commControl)
 	{
 		for (auto i = 0; i < 2; i++)
 		{
@@ -240,7 +243,7 @@ void LiquidCrystal_I2C::clear()
 void LiquidCrystal_I2C::home()
 {
 	command(LCD_RETURNHOME); // set cursor position to zero
-	if (_rtControl)
+	if (_commControl)
 	{
 		for (auto i = 0; i < 2; i++)
 		{
@@ -373,21 +376,21 @@ void LiquidCrystal_I2C::writeStr(std::string str)
 	}
 }
 
-void LiquidCrystal_I2C::rtControlOn()
+void LiquidCrystal_I2C::commControlOn()
 {
-	_rtControl = 1;
+	_commControl = 1;
 }
 
-void LiquidCrystal_I2C::rtControlOff()
+void LiquidCrystal_I2C::commControlOff()
 {
-	_rtControl = 0;
+	_commControl = 0;
 }
 
 // sends first command from queue if rt control is enabled
 //NB: run at 1 command per millisecond, other timings may work but havent been testeds
 int LiquidCrystal_I2C::sendNextCommand()
 {
-	if (_rtControl)
+	if (_commControl)
 	{
 		return i2c_write_byte(_handle, 0x00);
 	}
@@ -401,6 +404,11 @@ int LiquidCrystal_I2C::isQueueEmpty()
 		return 1;
 	}
 	return 0;
+}
+
+int LiquidCrystal_I2C::getCommControl()
+{
+	return _commControl;
 }
 
 /*********** mid level commands, for sending data/cmds */
@@ -429,23 +437,26 @@ void LiquidCrystal_I2C::write4bits(uint8_t value)
 
 void LiquidCrystal_I2C::expanderWrite(uint8_t _data)
 {
-	if (_rtControl == 0)
+	if (_commControl == 0)
 	{
 		printIIC(_handle, (int)(_data) | _backlightval);
 	}
-	else if (_rtControl == 1)
+	else if (_commControl == 1)
 	{
-		commandQueue.push(_data);
+		commandQueue.push((int)(_data) | _backlightval);
 	}
 }
 
 void LiquidCrystal_I2C::pulseEnable(uint8_t _data)
 {
 	expanderWrite(_data | En); // En high
-	usleep(1000);			   // enable pulse must be >450ns
-
+	if (!_commControl){
+		usleep(1000);			   // enable pulse must be >450ns
+	}
 	expanderWrite(_data & ~En); // En low
-	usleep(1000);				// commands need > 37us to settle
+	if (!_commControl){
+		usleep(1000);				// commands need > 37us to settle
+	}
 }
 
 // Alias functions

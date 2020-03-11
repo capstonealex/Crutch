@@ -53,7 +53,7 @@
 #define Rs 0b00000001 // Register select bit
 
 // flags for rt control
-#define SLEEP 0xff // NB: any 0xff sent will be treated as a skip/sleep if rtControl is on
+#define SLEEP 0xff // NB: any 0xff sent will be treated as a skip/sleep if commControl is on
 
 class LiquidCrystal_I2C
 {
@@ -88,14 +88,15 @@ public:
   void setCursor(uint8_t col, uint8_t row);
   virtual void writeI2C(uint8_t);
   void writeStr(std::string str);
-  void rtControlOn();
-  void rtControlOff();
+  void commControlOn();
+  void commControlOff();
   int sendNextCommand(); // sends next command from queue
 
   void command(uint8_t);
   void init();
   int getHandle();
   int isQueueEmpty(); // returns 1 if queue is empty, 0 if it isn't
+  int getCommControl();
 
   ////compatibility API function aliases
   void blink_on();                                             // alias for blink()
@@ -116,9 +117,9 @@ public:
   void draw_horizontal_graph(uint8_t row, uint8_t column, uint8_t len, uint8_t pixel_col_end);
   void draw_vertical_graph(uint8_t row, uint8_t column, uint8_t len, uint8_t pixel_col_end);
   //made public for compulation
-  int _rtControl;
+  int _commControl;
   int _handle;
-  std::queue<uint8_t> commandQueue; // gives control over when each command is sent, only used when _rtControl == 1
+  std::queue<uint8_t> commandQueue; // gives control over when each command is sent, only used when _commControl == 1
 
 private:
   void init_priv();
