@@ -28,6 +28,10 @@ public:
 	void setNextMove(int nm);
 	void flash();
 	void populateMap();
+	void commControlOn();
+	void commControlOff();
+	int sendNextCommand();
+	int isQueueEmpty();
 	std::map<int, std::string> intToStateODMap;
 	std::map<int, std::string> intToMvmntODMap;
 

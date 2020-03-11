@@ -121,6 +121,26 @@ void LCD::flash()
 	lcd->backlight();
 }
 
+void LCD::commControlOn()
+{
+	lcd->commControlOn();
+}
+
+void LCD::commControlOff()
+{
+	lcd->commControlOff();
+}
+
+int LCD::sendNextCommand()
+{
+	return lcd->sendNextCommand();
+}
+
+int LCD::isQueueEmpty()
+{
+	return lcd->isQueueEmpty();
+}
+
 void LCD::populateMap()
 {
 

@@ -18,6 +18,7 @@ Crutch::Crutch(/* args */)
 
 Crutch::~Crutch()
 {
+	lcd->commControlOff();
     lcd->~LCD();
     std::cout << "Crutch object deleted" << std::endl;
 }
@@ -27,7 +28,9 @@ void Crutch::initCrutch()
     lcd = new LCD();
     lcd->setup();
     lastState = 50;
+    lcd->commControlOn();
 }
+
 void Crutch::run()
 {
     CO_OD_RAM.currentState = 5;
@@ -35,7 +38,9 @@ void Crutch::run()
 
     incrementCount();
     updateButtons();
-    //crutchTest();
+
+    nextBut = 1;
+    crutchTest();
     // If current State is a stationary State
     if (isStationaryState(currState))
     {
@@ -80,6 +85,11 @@ void Crutch::run()
     {
         // Just step through movement
         CO_OD_RAM.goButton = goBut;
+    }
+
+    if (!lcd->isQueueEmpty())
+    {
+    	lcd->sendNextCommand();
     }
 }
 
