@@ -130,9 +130,9 @@ int LiquidCrystal_I2C::i2c_write_byte(int handle, unsigned char val)
 	else if (_commControl == 1)
 	{
 		unsigned char comm = commandQueue.front();
+		commandQueue.pop();
 		if (comm == 0xff)
 		{
-			commandQueue.pop();
 			return 0;
 		}
 		int i = 0;
@@ -143,10 +143,8 @@ int LiquidCrystal_I2C::i2c_write_byte(int handle, unsigned char val)
 		if (i >= 10)
 		{
 			fprintf(stderr, "i2c_write_byte error: %s\n", strerror(errno));
-			commandQueue.pop();
 			return -1;
 		}
-		commandQueue.pop();
 	}
 	return (1);
 }
@@ -203,7 +201,6 @@ void LiquidCrystal_I2C::begin(uint8_t cols, uint8_t lines, uint8_t dotsize)
 
 	// finally, set to 4-bit interface
 	write4bits(0x02 << 4);
-
 	// set # lines, font size, etc.
 	command(LCD_FUNCTIONSET | _displayfunction);
 

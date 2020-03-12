@@ -12,7 +12,7 @@ Crutch::Crutch(/* args */)
     std::cout << "Crutch object created" << std::endl;
 
     lcd = new LCD();
-    // lcd->setup();
+    lcd->setup();
     populateDictionary();
 }
 
@@ -25,8 +25,8 @@ Crutch::~Crutch()
 
 void Crutch::initCrutch()
 {
-    lcd = new LCD();
-    lcd->setup();
+    //lcd = new LCD();
+    //lcd->setup();
     lastState = 50;
     lcd->commControlOn();
 }
@@ -36,8 +36,8 @@ void Crutch::run()
     currState = CO_OD_RAM.currentState;
 
     incrementCount();
-    updateButtons();
-    //crutchTest();
+    //updateButtons();
+    crutchTest();
     // If current State is a stationary State
     if (isStationaryState(currState))
     {
@@ -112,7 +112,7 @@ void Crutch::printCSNM()
         // lcd->setCurrState(this->currState);
         // lcd->printCurrState();
         // std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
-        // lastState = currState;
+        //lastState = currState;
     }
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];
