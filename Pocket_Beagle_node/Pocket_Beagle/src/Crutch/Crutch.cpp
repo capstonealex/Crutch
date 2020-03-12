@@ -18,7 +18,6 @@ Crutch::Crutch(/* args */)
 
 Crutch::~Crutch()
 {
-	lcd->commControlOff();
     lcd->~LCD();
     std::cout << "Crutch object deleted" << std::endl;
 }
