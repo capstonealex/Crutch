@@ -30,6 +30,7 @@ LCD::LCD()
 
 LCD::~LCD()
 {
+	lcd->commControlOff();
 	lcd->clear();
 	lcd->noCursor();
 	lcd->noBacklight();
