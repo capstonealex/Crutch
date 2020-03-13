@@ -27,20 +27,19 @@ void Crutch::initCrutch()
     //lcd = new LCD();
     //lcd->setup();
     lastState = 50;
+    nextMove = 1;
     lcd->commControlOn();
 }
 
 void Crutch::run()
 {
-    currState = CO_OD_RAM.currentState;
-
+    // currState = CO_OD_RAM.currentState;
     incrementCount();
     updateButtons();
     // crutchTest();
     // If current State is a stationary State
     if (isStationaryState(currState))
     {
-        //printf("true \n");
         // Cycle forward with debounce
         if (nextBut && !prevNextBut)
         {
@@ -92,27 +91,28 @@ void Crutch::run()
 
 void Crutch::printCSNM()
 {
-
-    if (currState != lastState)
+    if (isStationaryState(currState))
     {
-        lcd->setCurrState(this->currState);
-        lcd->printCurrState();
-        std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
-        lastState = currState;
-    }
-    //printf("Test: %d \n", CO_OD_RAM.currentState);
 
-    if (nextMove != lastNextMove)
-    {
-        lcd->setNextMove(nextMove);
-        lcd->printNextMove();
-        std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
-        lastNextMove = nextMove;
+        if (currState != lastState)
+        {
+            lcd->setCurrState(this->currState);
+            lcd->printCurrState();
+            sleep(1);
+            std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
+            lastState = currState;
+        }
+        //printf("Test: %d \n", CO_OD_RAM.currentState);
 
-        // lcd->setCurrState(this->currState);
-        // lcd->printCurrState();
-        // std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
-        //lastState = currState;
+        if (nextMove != lastNextMove)
+        {
+            lcd->setNextMove(nextMove);
+            lcd->printNextMove();
+            sleep(1);
+            std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
+            lastNextMove = nextMove;
+            currState = 9;
+        }
     }
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];

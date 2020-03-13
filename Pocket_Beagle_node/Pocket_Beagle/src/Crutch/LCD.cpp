@@ -57,20 +57,23 @@ void LCD::setup()
 {
 	lcd->backlight();
 	printStr("CS:", 0, 0);
+	sleep(1);
 	printStr("NM:", 0, 1);
+	sleep(1);
+
 	lcd->commControlOn();
 }
 
 void LCD::printCurrState()
 {
-	// clearCurrState();
+	clearCurrState();
 	printStr(intToStateODMap[currState], 3, 0);
 }
 
 void LCD::printNextMove()
 {
 	std::cout << "LCD LEVEL NEXT MOVE:" << intToMvmntODMap[nextMove] << std::endl;
-	// clearNextMove();
+	clearNextMove();
 	printStr(intToMvmntODMap[nextMove], 3, 1);
 }
 
