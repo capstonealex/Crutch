@@ -36,7 +36,7 @@ void app_programStart(void)
     // Testing LCD TRANSITIONS
     exoCrutch.stateIndex = 1;
     exoCrutch.setCurrentState(exoCrutch.stateIndex);
-    CO_OD_RAM.currentState = 2;
+    CO_OD_RAM.currentState = 4;
     exoCrutch.initCrutch();
     exoCrutch.counter = 0;
 }
@@ -60,9 +60,9 @@ void app_programAsync(uint16_t timer1msDiff)
 void app_program1ms(void)
 {
     exoCrutch.counter++;
-    std::cout<< exoCrutch.counter;
     exoCrutch.run();
-    if (exoCrutch->counter %1000000){
-        exoCrutch.printCSNM();
+    if (exoCrutch.counter % 10000000)
+    {
+        // exoCrutch.printCSNM();
     }
 }

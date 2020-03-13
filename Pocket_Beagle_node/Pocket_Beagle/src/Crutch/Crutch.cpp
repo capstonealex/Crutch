@@ -35,8 +35,8 @@ void Crutch::run()
     currState = CO_OD_RAM.currentState;
 
     incrementCount();
-    //updateButtons();
-    crutchTest();
+    updateButtons();
+    // crutchTest();
     // If current State is a stationary State
     if (isStationaryState(currState))
     {
@@ -45,6 +45,7 @@ void Crutch::run()
         if (nextBut && !prevNextBut)
         {
             nextMove = nextMove % 11 + 1;
+            std::cout << "NEXT MOVE:" << lcd->intToMvmntODMap[nextMove] << std::endl;
         }
         if (lastBut && !prevLastBut)
         {
@@ -85,7 +86,7 @@ void Crutch::run()
 
     if (!lcd->isQueueEmpty())
     {
-    	lcd->sendNextCommand();
+        lcd->sendNextCommand();
     }
 }
 
@@ -163,7 +164,7 @@ void Crutch::testOD()
 /*Cycle through current state from 1- 10 and back again to test printing to screen CSNM*/
 void Crutch::crutchTest()
 {
-    if (counter % 50 == 0)
+    if (counter % 5000 == 0)
     {
         stateIndex++;
         if (stateIndex == 11)
