@@ -61,8 +61,5 @@ void app_program1ms(void)
 {
     exoCrutch.counter++;
     exoCrutch.run();
-    if (exoCrutch.counter % 10000000)
-    {
-        // exoCrutch.printCSNM();
-    }
+    exoCrutch.printCSNM();
 }
