@@ -33,7 +33,7 @@ void Crutch::initCrutch()
 
 void Crutch::run()
 {
-    // currState = CO_OD_RAM.currentState;
+    currState = CO_OD_RAM.currentState;
     incrementCount();
     updateButtons();
     // crutchTest();
@@ -98,7 +98,7 @@ void Crutch::printCSNM()
         {
             lcd->setCurrState(this->currState);
             lcd->printCurrState();
-            sleep(1);
+            //sleep(1);
             std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
             lastState = currState;
         }
@@ -108,10 +108,13 @@ void Crutch::printCSNM()
         {
             lcd->setNextMove(nextMove);
             lcd->printNextMove();
-            sleep(1);
+            //sleep(1);
             std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
             lastNextMove = nextMove;
-            currState = 9;
+            if (nextMove == 9)
+            {
+                CO_OD_RAM.currentState = 9;
+            }
         }
     }
 
