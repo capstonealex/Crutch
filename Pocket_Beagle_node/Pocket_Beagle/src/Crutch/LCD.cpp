@@ -16,8 +16,8 @@
 #define LCD_COLS 20
 #define LCD_ROWS 4
 #define I2C_BUS 1 // NB: Bus 2 is on port 1 on PB
-#define PIN1 9	//NB: on port 1 (i2c bus 2) of PB
-#define PIN2 11   //NB: on port 1 (i2c bus 2) of PB
+#define PIN1 9	  //NB: on port 1 (i2c bus 2) of PB
+#define PIN2 11	  //NB: on port 1 (i2c bus 2) of PB
 
 LCD::LCD()
 {
@@ -57,9 +57,9 @@ void LCD::setup()
 {
 	lcd->backlight();
 	printStr("CS:", 0, 0);
-	// sleep(1);
+	sleep(1);
 	printStr("NM:", 0, 1);
-	// sleep(1);
+	sleep(1);
 
 	lcd->commControlOn();
 }
