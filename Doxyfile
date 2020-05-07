@@ -907,9 +907,7 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */Crutch/Pocket_Beagle_Node/CANopenSocket*
-EXCLUDE_PATTERNS       += */Pocket_Beagle_Node/Pocket_Beagle/src/CANopenNode/*
-EXCLUDE_PATTERNS       += */Pocket_Beagle_Node/Pocket_Beagle/src/ObjDict/*
+EXCLUDE_PATTERNS       = */exo/src/*
 
 
 
