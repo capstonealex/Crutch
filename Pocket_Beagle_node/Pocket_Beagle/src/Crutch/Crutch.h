@@ -49,7 +49,7 @@ private:
 
     std::map<int, int> enterMap;
     std::map<int, int> exitMap;
-    std::map<int, std::array<int, 8>> stageMap;
+    std::map<int, std::array<int, 10>> stageMap;
     std::map<int, int> indexMap;
 
     void updateButtons();
