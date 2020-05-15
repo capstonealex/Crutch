@@ -14,6 +14,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <array>
+
 using namespace std;
 class Crutch
 {
@@ -29,6 +31,10 @@ private:
     int lastState;
     int nextMove;
     int lastNextMove;
+    int stage;
+    int index;
+    int choosingMove;
+    int feetTogether;
 
     // Button Variables
     int nextBut;
@@ -41,9 +47,19 @@ private:
     std::string lastButPath = "/sys/class/gpio/gpio58/value";
     std::string goButPath = "/sys/class/gpio/gpio57/value";
 
+    std::map<int, int> enterMap;
+    std::map<int, int> exitMap;
+    std::map<int, std::array<int, 8>> stageMap;
+    std::map<int, int> indexMap;
+
     void updateButtons();
     int checkButton(std::string path);
     int isStationaryState(int state);
+    void updateStageEnter();
+    void updateStageExit();
+    void updateIndex();
+    void decrementIndex();
+    void incrementIndex();
 
 public:
     Crutch(/* args */);

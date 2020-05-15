@@ -13,12 +13,19 @@ Crutch::Crutch(/* args */)
 
     lcd = new LCD();
     lcd->setup();
+
+    stage = 0;
+    index = 1;
+    choosingMove = 0;
+    feetTogether = 1;
+
     populateDictionary();
 }
 
 Crutch::~Crutch()
 {
     lcd->~LCD();
+
     std::cout << "Crutch object deleted" << std::endl;
 }
 
@@ -41,21 +48,34 @@ void Crutch::run()
     if (isStationaryState(currState))
     {
         // Cycle forward with debounce
+    	if (!choosingMove){
+    		choosingMove = 1;
+    		updateStageExit();
+    	}
         if (nextBut && !prevNextBut)
         {
-            nextMove = nextMove % 11 + 1;
+        	/*
+        	index = index % 11 + 1;
+            nextMove = stageMap[stage][index];
+            */
+        	incrementIndex();
             std::cout << "NEXT MOVE:" << lcd->intToMvmntODMap[nextMove] << std::endl;
         }
         if (lastBut && !prevLastBut)
         {
-            if (nextMove <= 1)
+        	/*
+            if (index <= 1)
             {
-                nextMove = 11;
+            	index = 11;
+                nextMove = stageMap[stage][index];
             }
             else
             {
-                nextMove = nextMove - 1;
+            	index -= 1;
+                nextMove = stageMap[stage][index];
             }
+            */
+        	decrementIndex();
         }
         prevNextBut = nextBut;
         prevLastBut = lastBut;
@@ -70,6 +90,8 @@ void Crutch::run()
             else
             {
                 CO_OD_RAM.nextMovement = nextMove;
+                updateStageEnter();
+                choosingMove = 0;
             }
         }
         else
@@ -175,6 +197,9 @@ void Crutch::crutchTest()
             stateIndex = 1;
         }
         setCurrentState(stateIndex);
+
+        index = index % 11 + 1;
+
     }
 }
 
@@ -218,6 +243,102 @@ void Crutch::populateDictionary()
     intToStateODMap[13] = "Step L";
     intToStateODMap[14] = "Step R";
 
+    //Stages
+    //TODO: stage 3 isnt accessible yet
+    enterMap[1] = -1;
+    enterMap[2] = 4;
+    enterMap[3] = -1;
+    enterMap[4] = 6;
+    enterMap[5] = -1;
+    enterMap[6] = -1;
+    enterMap[7] = -1;
+    enterMap[8] = -1;
+    enterMap[9] = -1;
+    enterMap[10] = -1;
+
+    exitMap[1] = -1;
+    exitMap[2] = -1;
+    exitMap[3] = 5;
+    exitMap[4] = -1;
+    exitMap[5] = -1;
+    exitMap[6] = -1;
+    exitMap[7] = -1;
+    exitMap[8] = 0;
+    exitMap[9] = 1;
+    exitMap[10] = -1;
+
+    //sitting
+    for (int i=0; i<11; i++){
+    	stageMap[0][i+1] = 9;
+    }
+
+    //regular
+    stageMap[1][1] = 1;
+    stageMap[1][2] = 7;
+    stageMap[1][3] = 2;
+    stageMap[1][4] = 3;
+    stageMap[1][5] = 1;//TODO: add tilt option
+    stageMap[1][6] = 4;
+    stageMap[1][7] = 5;
+    stageMap[1][8] = 10;
+    stageMap[1][9] = 6;
+    stageMap[1][10] = 8;
+
+    //uneven ground
+    stageMap[3][1] = 1;
+    stageMap[3][2] = 7;
+    stageMap[3][3] = 10;
+    stageMap[3][4] = 2;
+    stageMap[3][5] = 3;
+    stageMap[3][6] = 4;
+    stageMap[3][7] = 5;
+    stageMap[3][8] = 1;//TODO: add tilt option
+    stageMap[3][9] = 6;
+    stageMap[3][10] = 8;
+
+    //stairs
+    stageMap[4][1] = 1;
+    stageMap[4][2] = 3;
+    stageMap[4][3] = 2;
+    stageMap[4][4] = 1; // TODO: add tilt
+    stageMap[4][5] = 4;
+    stageMap[4][6] = 5;
+    stageMap[4][7] = 10;
+    stageMap[4][8] = 6;
+    stageMap[4][9] = 7;
+    stageMap[4][10] = 8;
+
+    //tilt
+    stageMap[5][1] = 1;
+    stageMap[5][2] = 1; //TODO: add tilt
+    stageMap[5][3] = 2;
+    stageMap[5][4] = 3;
+    stageMap[5][5] = 4;
+    stageMap[5][6] = 5;
+    stageMap[5][7] = 10;
+    stageMap[5][8] = 6;
+    stageMap[5][9] = 7;
+    stageMap[5][10] = 8;
+
+    //ramp
+    stageMap[6][1] = 1;
+    stageMap[6][2] = 4;
+    stageMap[6][3] = 5;
+    stageMap[6][4] = 2;
+    stageMap[6][5] = 3;
+    stageMap[6][6] = 1; //TODO: add tilt
+    stageMap[6][7] = 10;
+    stageMap[6][8] = 6;
+    stageMap[6][9] = 7;
+    stageMap[6][10] = 8;
+
+    //So that the movement selected by the index doesn't change when the stage changes
+    indexMap[1] = 1;
+    indexMap[3] = 1; //TODO: entrance into stage 3
+    indexMap[4] = 3;
+    indexMap[5] = 4;
+    indexMap[6] = 2;
+
     std::cout << "Dictionary populated" << std::endl;
 }
 
@@ -258,3 +379,81 @@ int Crutch::checkButton(std::string path)
         return 0;
     }
 }
+
+void Crutch::updateStageEnter(){
+	if (enterMap[nextMove] != -1){
+		stage = enterMap[nextMove];
+	}
+	if (nextMove == 6){
+		feetTogether = 1;
+	}
+	updateIndex();
+}
+
+void Crutch::updateStageExit(){
+	if (exitMap[nextMove] != -1){
+		stage = exitMap[nextMove];
+	}
+	if (nextMove == 6){
+		feetTogether = 0;
+	}
+	updateIndex();
+}
+
+void Crutch::decrementIndex(){
+	if (feetTogether){
+		if (index <= 1)
+		{
+			index = 11;
+			nextMove = stageMap[stage][index];
+		}
+		else
+		{
+			index -= 1;
+			nextMove = stageMap[stage][index];
+		}
+	}
+	else if (!feetTogether){
+		if (index <= 1){
+			index = 11;
+			nextMove = stageMap[stage][index];
+		}
+		else if (4 < index && index < 8){
+			index = 4;
+		}
+		else{
+			index -= 1;
+		}
+	}
+}
+
+void Crutch::incrementIndex(){
+	if (feetTogether){
+		index = index % 11 + 1;
+		nextMove = stageMap[stage][index];
+	}
+	else if (!feetTogether){
+		if (index > 4){
+			index = 8;
+		}
+		else if (index > 10){
+			index = 1;
+		}
+		else{
+			index += 1;
+		}
+	}
+}
+
+void Crutch::updateIndex(){
+	if (indexMap[stage]){
+		index = indexMap[stage];
+	}
+}
+
+
+
+
+
+
+
