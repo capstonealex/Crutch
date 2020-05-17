@@ -18,6 +18,7 @@ public:
 	void printStr(std::string str);
 	void printStr(std::string str, uint8_t col, uint8_t row);
 	void setup();
+	void printStage(int stage);
 	void printCurrState();
 	void printNextMove();
 	void clearCurrState();

@@ -175,3 +175,8 @@ void LCD::populateMap()
 	intToStateODMap[13] = "Step L";
 	intToStateODMap[14] = "Step R";
 }
+
+void LCD::printStage(int stage){
+	lcd->setCursor(15, 0);
+	lcd->writeI2C(stage);
+}

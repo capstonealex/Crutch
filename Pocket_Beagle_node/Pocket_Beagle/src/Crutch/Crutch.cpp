@@ -138,6 +138,7 @@ void Crutch::printCSNM()
                 CO_OD_RAM.currentState = 9;
             }
         }
+        lcd->printStage(stage);
     }
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];
