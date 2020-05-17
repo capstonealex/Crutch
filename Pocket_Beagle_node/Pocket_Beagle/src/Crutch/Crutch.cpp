@@ -254,7 +254,7 @@ void Crutch::populateDictionary()
     enterMap[7] = -1;
     enterMap[8] = -1;
     enterMap[9] = -1;
-    enterMap[10] = -1;
+    enterMap[10] = 3;
 
     exitMap[1] = -1;
     exitMap[2] = -1;
@@ -333,8 +333,9 @@ void Crutch::populateDictionary()
     stageMap[6][10] = 8;
 
     //So that the movement selected by the index doesn't change when the stage changes
+    indexMap[0] = 1;
     indexMap[1] = 1;
-    indexMap[3] = 1; //TODO: entrance into stage 3
+    indexMap[3] = 3;
     indexMap[4] = 3;
     indexMap[5] = 4;
     indexMap[6] = 2;
@@ -401,6 +402,18 @@ void Crutch::updateStageExit(){
 }
 
 void Crutch::decrementIndex(){
+	if (index <= 1)
+	{
+		index = 11;
+		nextMove = stageMap[stage][index];
+	}
+	else
+	{
+		index -= 1;
+		nextMove = stageMap[stage][index];
+	}
+	/*
+	 * for limiting options whilst feet are seperated
 	if (feetTogether){
 		if (index <= 1)
 		{
@@ -425,9 +438,14 @@ void Crutch::decrementIndex(){
 			index -= 1;
 		}
 	}
+	*/
 }
 
 void Crutch::incrementIndex(){
+	index = index % 11 + 1;
+	nextMove = stageMap[stage][index];
+	/*
+	 * for limiting options whilst feet are seperated
 	if (feetTogether){
 		index = index % 11 + 1;
 		nextMove = stageMap[stage][index];
@@ -443,6 +461,7 @@ void Crutch::incrementIndex(){
 			index += 1;
 		}
 	}
+	*/
 }
 
 void Crutch::updateIndex(){
