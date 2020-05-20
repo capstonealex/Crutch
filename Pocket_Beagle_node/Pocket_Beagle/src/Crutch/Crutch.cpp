@@ -11,8 +11,8 @@ Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
-    //lcd = new LCD();
-    //lcd->setup();
+    lcd = new LCD();
+    lcd->setup();
 
     stage = 0;
     index = 1;
@@ -24,7 +24,7 @@ Crutch::Crutch(/* args */)
 
 Crutch::~Crutch()
 {
-    //lcd->~LCD();
+    lcd->~LCD();
 
     std::cout << "Crutch object deleted" << std::endl;
 }
@@ -269,7 +269,7 @@ void Crutch::populateDictionary()
     exitMap[10] = -1;
 
     //sitting
-    for (int i=0; i<11; i++){
+    for (int i=1; i<11; i++){
     	stageMap[0][i+1] = 9;
     }
 
