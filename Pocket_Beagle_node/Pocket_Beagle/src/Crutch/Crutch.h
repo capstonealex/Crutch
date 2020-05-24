@@ -9,17 +9,16 @@
 #define STANDING 2
 #define SITTING 3
 
-#include "LCD.h"
-#include <string>
-#include <vector>
+#include <array>
 #include <map>
 #include <string>
-#include <array>
+#include <vector>
+
+#include "LCD.h"
 
 using namespace std;
-class Crutch
-{
-private:
+class Crutch {
+   private:
     /* Jagged array for Current state, next motion relationship */
     // walking, standing and sitting w/ their Next motion lists
     // vector<vector<std::string>> nextMotion{
@@ -43,8 +42,8 @@ private:
     int prevLastBut;
     int goBut;
 
-    std::string nextButPath = "/sys/class/gpio/gpio59/value";
-    std::string lastButPath = "/sys/class/gpio/gpio58/value";
+    std::string nextButPath = "/sys/class/gpio/gpio65/value";
+    std::string lastButPath = "/sys/class/gpio/gpio27/value";
     std::string goButPath = "/sys/class/gpio/gpio57/value";
 
     std::map<int, int> enterMap;
@@ -61,7 +60,7 @@ private:
     void decrementIndex();
     void incrementIndex();
 
-public:
+   public:
     Crutch(/* args */);
     ~Crutch();
     void run();
