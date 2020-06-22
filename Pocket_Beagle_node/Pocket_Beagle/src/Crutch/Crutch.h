@@ -42,8 +42,8 @@ class Crutch {
     int prevLastBut;
     int goBut;
 
-    std::string nextButPath = "/sys/class/gpio/gpio65/value";
-    std::string lastButPath = "/sys/class/gpio/gpio27/value";
+    std::string nextButPath = "/sys/class/gpio/gpio59/value";
+    std::string lastButPath = "/sys/class/gpio/gpio58/value";
     std::string goButPath = "/sys/class/gpio/gpio57/value";
 
     std::map<int, int> enterMap;
