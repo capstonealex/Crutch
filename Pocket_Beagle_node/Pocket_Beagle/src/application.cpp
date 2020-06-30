@@ -35,10 +35,12 @@ void app_programStart(void)
 {
     // Testing LCD TRANSITIONS
     exoCrutch.stateIndex = 1;
-    exoCrutch.setCurrentState(exoCrutch.stateIndex);
+    exoCrutch.setCurrentState(Init);
     CO_OD_RAM.currentState = 4;
     exoCrutch.initCrutch();
     exoCrutch.counter = 0;
+
+    std::cout << "End app_programStart" << std::endl;
 }
 
 /******************************************************************************/

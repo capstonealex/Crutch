@@ -6,11 +6,7 @@
  */
 
 #include "LCD.h"
-#include <LiquidCrystal_I2C.h>
-#include <map>
-#include <inttypes.h>
-#include <iostream>
-#include <unistd.h>
+
 
 #define LCD_ADDR 0x20
 #define LCD_COLS 20
@@ -24,9 +20,9 @@ LCD::LCD()
 	lcd = new LiquidCrystal_I2C(LCD_ADDR, LCD_COLS, LCD_ROWS, I2C_BUS);
 	lcd->configure_i2c_pins(PIN1, PIN2);
 	lcd->init();
-	populateMap();
 	std::cout << "LCD object created" << std::endl;
 }
+
 
 LCD::~LCD()
 {
@@ -64,17 +60,18 @@ void LCD::setup()
 	lcd->commControlOn();
 }
 
-void LCD::printCurrState()
+void LCD::printCurrState(std::string currState)
 {
+	std::cout << "LCD CS: " << currState << std::endl;
 	clearCurrState();
-	printStr(intToStateODMap[currState], 3, 0);
+	printStr(currState, 3, 0);
 }
 
-void LCD::printNextMove()
+void LCD::printNextMove(std::string nextMove)
 {
-	std::cout << "LCD LEVEL NEXT MOVE:" << intToMvmntODMap[nextMove] << std::endl;
+	std::cout << "LCD LEVEL NEXT MOVE:" << nextMove << std::endl;
 	clearNextMove();
-	printStr(intToMvmntODMap[nextMove], 3, 1);
+	printStr(nextMove, 3, 1);
 }
 
 void LCD::clearCurrState()
@@ -97,26 +94,6 @@ void LCD::clearNextMove()
 		lcd->writeI2C(' ');
 	}
 	lcd->noCursor();
-}
-
-int LCD::getCurrState()
-{
-	return currState;
-}
-
-int LCD::getNextMove()
-{
-	return nextMove;
-}
-
-void LCD::setCurrState(int cs)
-{
-	currState = cs;
-}
-
-void LCD::setNextMove(int nm)
-{
-	nextMove = nm;
 }
 
 void LCD::flash()
@@ -144,36 +121,6 @@ int LCD::sendNextCommand()
 int LCD::isQueueEmpty()
 {
 	return lcd->isQueueEmpty();
-}
-
-void LCD::populateMap()
-{
-
-	intToMvmntODMap[1] = "Normal";
-	intToMvmntODMap[2] = "Up stair";
-	intToMvmntODMap[3] = "Dwm stair";
-	intToMvmntODMap[4] = "Up slope";
-	intToMvmntODMap[5] = "Dwn slope";
-	intToMvmntODMap[6] = "Ft TG";
-	intToMvmntODMap[7] = "Backstep";
-	intToMvmntODMap[8] = "Sit Dwn";
-	intToMvmntODMap[9] = "Stand Up";
-	intToMvmntODMap[10] = "Uneven";
-
-	intToStateODMap[1] = "Error";
-	intToStateODMap[2] = "Init";
-	intToStateODMap[3] = "Left Frwd";
-	intToStateODMap[4] = "Right Frwd";
-	intToStateODMap[5] = "Standing";
-	intToStateODMap[6] = "Sitting";
-	intToStateODMap[7] = "Sit dWn";
-	intToStateODMap[8] = "Stand Up";
-	intToStateODMap[9] = "1st L";
-	intToStateODMap[10] = "1st R";
-	intToStateODMap[11] = "last L";
-	intToStateODMap[12] = "last R";
-	intToStateODMap[13] = "Step L";
-	intToStateODMap[14] = "Step R";
 }
 
 void LCD::printStage(int stage){

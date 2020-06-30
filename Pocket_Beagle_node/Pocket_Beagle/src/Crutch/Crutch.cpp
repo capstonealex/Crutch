@@ -7,19 +7,27 @@
 #include <fstream>
 #include <algorithm>
 
+
+
 Crutch::Crutch(/* args */)
 {
     std::cout << "Crutch object created" << std::endl;
 
     lcd = new LCD();
+    #ifndef _NOLCD
     lcd->setup();
+    #endif
 
-    stage = 0;
+    stage = Default;
     index = 1;
     choosingMove = 0;
     feetTogether = 1;
 
     populateDictionary();
+
+    #ifdef _KEYBOARD
+        kb = new Keyboard();
+    #endif
 }
 
 Crutch::~Crutch()
@@ -31,51 +39,49 @@ Crutch::~Crutch()
 
 void Crutch::initCrutch()
 {
-    //lcd = new LCD();
-    //lcd->setup();
-    lastState = 50;
-    nextMove = 1;
+    lastState = Error;
+    nextMove = Normal;
+    #ifndef _NOLCD
     lcd->commControlOn();
+    #endif
 }
 
 void Crutch::run()
 {
-    currState = CO_OD_RAM.currentState;
-    incrementCount();
+    // Take the current state from the object dictionary - this is passed on from the OD on the Main Beaglebone
+    currState = static_cast<SMState>(CO_OD_RAM.currentState);
+    
+
+     // This is a record of the number of iterations of this device - not currently used
+     // Could be used to detect a long press though. 
+    incrementCount();. 
+    
+    // Poll the buttons
     updateButtons();
-    // crutchTest();
+
     // If current State is a stationary State
     if (isStationaryState(currState))
     {
         // Cycle forward with debounce
-    	if (!choosingMove){
+    	/*if (!choosingMove){
     		choosingMove = 1;
-    		updateStageExit();
-    	}
+    	}*/
         if (nextBut && !prevNextBut)
         {
-        	/*
-        	index = index % 11 + 1;
-            nextMove = stageMap[stage][index];
-            */
-        	incrementIndex();
-            std::cout << "NEXT MOVE:" << lcd->intToMvmntODMap[nextMove] << std::endl;
+        	index = (index +1) % stageMovementList[stage].size();
+            nextMove = stageMovementList[stage][index];
         }
         if (lastBut && !prevLastBut)
         {
-        	/*
-            if (index <= 1)
+           if (index < 1)
             {
-            	index = 11;
-                nextMove = stageMap[stage][index];
+            	index = stageMovementList[stage].size() - 1;
             }
             else
             {
             	index -= 1;
-                nextMove = stageMap[stage][index];
             }
-            */
-        	decrementIndex();
+            nextMove = stageMovementList[stage][index];
         }
         prevNextBut = nextBut;
         prevLastBut = lastBut;
@@ -85,60 +91,73 @@ void Crutch::run()
         {
             if (nextMove == CO_OD_RAM.currentMovement)
             {
-                CO_OD_RAM.goButton = goBut;
+                // If the movement set on the ExoBeagle is the same as the one on the screen,
+                // Send the go button status on the OD to true 
+                CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
             }
             else
             {
-                CO_OD_RAM.nextMovement = nextMove;
-                updateStageEnter();
-                choosingMove = 0;
+                // If they are not the same, then send the next movement across to the exoskeleton
+                // and do not update the go button on the exo side
+                CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
+
+                //choosingMove = 0;
             }
         }
         else
         {
-            CO_OD_RAM.goButton = goBut;
+            // If the GoButton is not pressed, set the go button to false always
+            CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
         }
     }
     else
     {
-        // Just step through movement
-        CO_OD_RAM.goButton = goBut;
+        // If not in a stationary state, just map the GoButton to to the ExoBeagle OD
+        CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
     }
 
+    #ifndef _NOLCD
     if (!lcd->isQueueEmpty())
     {
         lcd->sendNextCommand();
     }
+    #endif
 }
 
 void Crutch::printCSNM()
 {
     if (isStationaryState(currState))
     {
-
+        // Only update the screen if we are in a stationary state
         if (currState != lastState)
         {
-            lcd->setCurrState(this->currState);
-            lcd->printCurrState();
+            // If the state has changed - update the screen to show the state
+            #ifndef _NOLCD
+            lcd->printCurrState(stateToString[currState]);
+            #endif
             //sleep(1);
-            std::cout << "Curr State: " << lcd->intToStateODMap[currState] << std::endl;
+            std::cout << "Curr State: " << stateToString[currState] << std::endl;
             lastState = currState;
         }
-        //printf("Test: %d \n", CO_OD_RAM.currentState);
 
         if (nextMove != lastNextMove)
         {
-            lcd->setNextMove(nextMove);
-            lcd->printNextMove();
+            // If the selected move has changed, update the selected move
+            #ifndef _NOLCD
+            lcd->printNextMove(movementToString[nextMove]);
+            #endif
             //sleep(1);
-            std::cout << "Next Move: " << lcd->intToMvmntODMap[nextMove] << std::endl;
+            std::cout << "Next Move: " << movementToString[nextMove] << std::endl;
             lastNextMove = nextMove;
-            if (nextMove == 9)
-            {
-                CO_OD_RAM.currentState = 9;
-            }
         }
-        lcd->printStage(stage);
+        
+        if (lastStage != stage){
+            #ifndef _NOLCD
+            lcd->printStage(stage);
+            #endif
+            std::cout << "Stage: " << stage << std::endl;
+            lastStage = stage;
+        }
     }
 
     // std::string name = nextMotion[RIGHT_FORWARD][3];
@@ -168,8 +187,9 @@ int Crutch::getCurrentState()
 // {
 //     currState = CO_OD_RAM.currentState;
 // }
+
 // TESTING LCD
-void Crutch::setCurrentState(int state)
+void Crutch::setCurrentState(SMState state)
 {
     // currState = CO_OD_RAM.currentState;
     currState = state;
@@ -182,13 +202,13 @@ void Crutch::incrementCount()
 void Crutch::testOD()
 {
     // setCurrentState();
-    std::cout << "Current state" << lcd->intToStateODMap[getCurrentState()] << std::endl;
+    std::cout << "Current state" << stateToString[currState] << std::endl;
     // TEST CURRENT MOTION
     // std::cout << "Current MOTION" << lcd->intToStateODMap[getCurrentMotion()] << std::endl;
 }
 
 /*Cycle through current state from 1- 10 and back again to test printing to screen CSNM*/
-void Crutch::crutchTest()
+/*void Crutch::crutchTest()
 {
     if (counter % 5000 == 0)
     {
@@ -202,7 +222,7 @@ void Crutch::crutchTest()
         index = index % 11 + 1;
 
     }
-}
+}*/
 
 void Crutch::printVector(vector<vector<std::string>> const &mat)
 {
@@ -215,35 +235,10 @@ void Crutch::printVector(vector<vector<std::string>> const &mat)
         cout << '\n';
     }
 }
-void Crutch::populateDictionary()
-{
-    stateToIntODMap["normal"] = 1;
-    stateToIntODMap["backstep"] = 2;
-    stateToIntODMap["feet together"] = 3;
-    stateToIntODMap["up stairs"] = 4;
-    stateToIntODMap["down stairs"] = 5;
-    stateToIntODMap["up slope"] = 6;
-    stateToIntODMap["down slope"] = 7;
-    stateToIntODMap["uneven"] = 8;
-    stateToIntODMap["Sit Down"] = 9;
-    stateToIntODMap["Stand Up"] = 10;
-    stateToIntODMap["Error"] = 11;
 
-    intToStateODMap[1] = "Error";
-    intToStateODMap[2] = "Init";
-    intToStateODMap[3] = "Left Forward";
-    intToStateODMap[4] = "Right Forward";
-    intToStateODMap[5] = "Standing";
-    intToStateODMap[6] = "Sitting";
-    intToStateODMap[7] = "Sitting Down";
-    intToStateODMap[8] = "Standing Up";
-    intToStateODMap[9] = "Step 1st L";
-    intToStateODMap[10] = "Step 1st R";
-    intToStateODMap[11] = "Step last L";
-    intToStateODMap[12] = "Step last R";
-    intToStateODMap[13] = "Step L";
-    intToStateODMap[14] = "Step R";
-
+/** This is legacy code to do with changing stages. It is not currently implemented, but I have kept it here because I don't 
+ * quite understand how it was meant to work. 
+ 
     //Stages
     //TODO: stage 3 isnt accessible yet
     enterMap[1] = -1;
@@ -273,66 +268,6 @@ void Crutch::populateDictionary()
     	stageMap[0][i+1] = 9;
     }
 
-    //regular
-    stageMap[1][1] = 1;
-    stageMap[1][2] = 7;
-    stageMap[1][3] = 2;
-    stageMap[1][4] = 3;
-    stageMap[1][5] = 1;//TODO: add tilt option
-    stageMap[1][6] = 4;
-    stageMap[1][7] = 5;
-    stageMap[1][8] = 10;
-    stageMap[1][9] = 6;
-    stageMap[1][10] = 8;
-
-    //uneven ground
-    stageMap[3][1] = 1;
-    stageMap[3][2] = 7;
-    stageMap[3][3] = 10;
-    stageMap[3][4] = 2;
-    stageMap[3][5] = 3;
-    stageMap[3][6] = 4;
-    stageMap[3][7] = 5;
-    stageMap[3][8] = 1;//TODO: add tilt option
-    stageMap[3][9] = 6;
-    stageMap[3][10] = 8;
-
-    //stairs
-    stageMap[4][1] = 1;
-    stageMap[4][2] = 3;
-    stageMap[4][3] = 2;
-    stageMap[4][4] = 1; // TODO: add tilt
-    stageMap[4][5] = 4;
-    stageMap[4][6] = 5;
-    stageMap[4][7] = 10;
-    stageMap[4][8] = 6;
-    stageMap[4][9] = 7;
-    stageMap[4][10] = 8;
-
-    //tilt
-    stageMap[5][1] = 1;
-    stageMap[5][2] = 1; //TODO: add tilt
-    stageMap[5][3] = 2;
-    stageMap[5][4] = 3;
-    stageMap[5][5] = 4;
-    stageMap[5][6] = 5;
-    stageMap[5][7] = 10;
-    stageMap[5][8] = 6;
-    stageMap[5][9] = 7;
-    stageMap[5][10] = 8;
-
-    //ramp
-    stageMap[6][1] = 1;
-    stageMap[6][2] = 4;
-    stageMap[6][3] = 5;
-    stageMap[6][4] = 2;
-    stageMap[6][5] = 3;
-    stageMap[6][6] = 1; //TODO: add tilt
-    stageMap[6][7] = 10;
-    stageMap[6][8] = 6;
-    stageMap[6][9] = 7;
-    stageMap[6][10] = 8;
-
     //So that the movement selected by the index doesn't change when the stage changes
     indexMap[0] = 1;
     indexMap[1] = 1;
@@ -340,30 +275,28 @@ void Crutch::populateDictionary()
     indexMap[4] = 3;
     indexMap[5] = 4;
     indexMap[6] = 2;
+**/
 
-    std::cout << "Dictionary populated" << std::endl;
-}
-
-int Crutch::isStationaryState(int state)
+bool Crutch::isStationaryState(SMState state)
 {
-    if (state >= 7)
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
+    return stateStationaryStatus[state];
 }
 
 void Crutch::updateButtons()
 {
-    nextBut = checkButton(nextButPath);
-    lastBut = checkButton(lastButPath);
-    goBut = checkButton(goButPath);
+    #ifdef _KEYBOARD
+        kb->updateInput();
+        nextBut = kb->getA();
+        lastBut = kb->getS();
+        goBut = kb->getD();
+    #else
+        nextBut = checkButton(nextButPath);
+        lastBut = checkButton(lastButPath);
+        goBut = checkButton(goButPath);
+    #endif
 }
 
-int Crutch::checkButton(std::string path)
+bool Crutch::checkButton(std::string path)
 {
     char value;
     std::ifstream stream(path);
@@ -372,16 +305,14 @@ int Crutch::checkButton(std::string path)
 
     if (value != '1')
     {
-        //printf("%s", path);
-        return 1;
-        //CO_OD_RAM.nextMovement = CO_OD_RAM.nextMovement+1;
+        return true;
     }
     else
     {
-        return 0;
+        return false;
     }
 }
-
+/*
 void Crutch::updateStageEnter(){
 	if (enterMap[nextMove] != -1){
 		stage = enterMap[nextMove];
@@ -401,17 +332,17 @@ void Crutch::updateStageExit(){
 	}
 	updateIndex();
 }
-
+*/
 void Crutch::decrementIndex(){
 	if (index <= 1)
 	{
 		index = 11;
-		nextMove = stageMap[stage][index];
+		nextMove = stageMovementList[stage][index];
 	}
 	else
 	{
 		index -= 1;
-		nextMove = stageMap[stage][index];
+		nextMove = stageMovementList[stage][index];
 	}
 	/*
 	 * for limiting options whilst feet are seperated
@@ -444,7 +375,7 @@ void Crutch::decrementIndex(){
 
 void Crutch::incrementIndex(){
 	index = index % 11 + 1;
-	nextMove = stageMap[stage][index];
+	nextMove = stageMovementList[stage][index];
 	/*
 	 * for limiting options whilst feet are seperated
 	if (feetTogether){
@@ -464,16 +395,4 @@ void Crutch::incrementIndex(){
 	}
 	*/
 }
-
-void Crutch::updateIndex(){
-	if (indexMap[stage]){
-		index = indexMap[stage];
-	}
-}
-
-
-
-
-
-
 

@@ -33,7 +33,7 @@
 #include <stdio.h>
 #include <string.h>     /* for memcpy */
 #include <stdlib.h>     /* for malloc, free */
-
+#include <iostream>
 
 #define RETURN_SUCCESS  0
 #define RETURN_ERROR   -1

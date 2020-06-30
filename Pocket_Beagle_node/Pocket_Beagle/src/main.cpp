@@ -44,6 +44,8 @@
 #include <pthread.h>
 #include <sys/time.h>
 
+#include <iostream>
+
 /*For master-> code SDO direct messaging*/
 // #define CO_COMMAND_SDO_BUFFER_SIZE 100000
 // #define STRING_BUFFER_SIZE (CO_COMMAND_SDO_BUFFER_SIZE * 4 + 100)
@@ -131,7 +133,7 @@ int main(int argc, char *argv[])
     bool_t rebootEnable = false;  /* Configurable by arguments */
 
     /*set up command line arguments as variables*/
-    char CANdevice[10] = "vcan0"; /* change to can1 for bbb vcan0 for virtual can*/
+    char CANdevice[10] = "can1"; /* change to can1 for bbb vcan0 for virtual can*/
     nodeId = NODEID;
     CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */
@@ -192,10 +194,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    /* initialize Object Dictionary storage */
-    odStorStatus_rom = CO_OD_storage_init(&odStor, (uint8_t *)&CO_OD_ROM, sizeof(CO_OD_ROM), odStorFile_rom);
-    odStorStatus_eeprom = CO_OD_storage_init(&odStorAuto, (uint8_t *)&CO_OD_EEPROM, sizeof(CO_OD_EEPROM), odStorFile_eeprom);
-
     /* Catch signals SIGINT and SIGTERM */
     if (signal(SIGINT, sigHandler) == SIG_ERR)
         CO_errExit("Program init - SIGINIT handler creation failed");
@@ -238,18 +236,6 @@ int main(int argc, char *argv[])
             char s[120];
             snprintf(s, 120, "Communication reset - CANopen initialization failed, err=%d", err);
             CO_errExit(s);
-        }
-
-        /* initialize OD objects 1010 and 1011 and verify errors. */
-        CO_OD_configure(CO->SDO[0], OD_H1010_STORE_PARAM_FUNC, CO_ODF_1010, (void *)&odStor, 0, 0U);
-        CO_OD_configure(CO->SDO[0], OD_H1011_REST_PARAM_FUNC, CO_ODF_1011, (void *)&odStor, 0, 0U);
-        if (odStorStatus_rom != CO_ERROR_NO)
-        {
-            CO_errorReport(CO->em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE, (uint32_t)odStorStatus_rom);
-        }
-        if (odStorStatus_eeprom != CO_ERROR_NO)
-        {
-            CO_errorReport(CO->em, CO_EM_NON_VOLATILE_MEMORY, CO_EMC_HARDWARE, (uint32_t)odStorStatus_eeprom + 1000);
         }
 
         /* Configure callback functions for task control */

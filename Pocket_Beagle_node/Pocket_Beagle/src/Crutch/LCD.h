@@ -5,10 +5,16 @@
  *      Author: Angus Wallace
  */
 
+#ifndef LCD_H_DEFINED
+#define LCD_H_DEFINED
+
 #include <string>
 #include <LiquidCrystal_I2C.h>
 #include <map>
 #include <inttypes.h>
+//#include "Crutch.h"
+#include <iostream>
+#include <unistd.h>
 
 class LCD
 {
@@ -18,26 +24,25 @@ public:
 	void printStr(std::string str);
 	void printStr(std::string str, uint8_t col, uint8_t row);
 	void setup();
+
 	void printStage(int stage);
-	void printCurrState();
-	void printNextMove();
+
+	void printCurrState(std::string currState);
+	void printNextMove(std::string nextMove);
 	void clearCurrState();
 	void clearNextMove();
-	int getCurrState();
-	int getNextMove();
-	void setCurrState(int cs);
-	void setNextMove(int nm);
+
 	void flash();
-	void populateMap();
+
 	void commControlOn();
 	void commControlOff();
+
 	int sendNextCommand();
 	int isQueueEmpty();
-	std::map<int, std::string> intToStateODMap;
-	std::map<int, std::string> intToMvmntODMap;
+
 
 private:
-	int currState;
-	int nextMove;
 	LiquidCrystal_I2C *lcd;
 };
+
+#endif
