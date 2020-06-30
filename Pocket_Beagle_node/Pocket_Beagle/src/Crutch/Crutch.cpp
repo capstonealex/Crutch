@@ -54,7 +54,7 @@ void Crutch::run()
 
      // This is a record of the number of iterations of this device - not currently used
      // Could be used to detect a long press though. 
-    incrementCount();. 
+    incrementCount();
     
     // Poll the buttons
     updateButtons();
