@@ -157,7 +157,6 @@ class Crutch {
     void initCrutch();
     void printVector(vector<vector<std::string>> const &mat);
 
-    void populateDictionary();
     //OD interfaces
     void setHeartBeat(int val);
     void setNextMotion(int val);

@@ -23,7 +23,6 @@ Crutch::Crutch(/* args */)
     choosingMove = 0;
     feetTogether = 1;
 
-    populateDictionary();
 
     #ifdef _KEYBOARD
         kb = new Keyboard();
