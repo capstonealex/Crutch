@@ -1,61 +1,66 @@
 #include "Crutch.h"
-#include <iostream>
-#include <unistd.h>
-#include "CANopen.h"
+
 #include <fcntl.h>
 #include <sys/epoll.h>
-#include <fstream>
+#include <unistd.h>
+
 #include <algorithm>
+#include <fstream>
+#include <iostream>
 
+#include "CANopen.h"
 
-
-Crutch::Crutch(/* args */)
-{
+Crutch::Crutch(/* args */) {
     std::cout << "Crutch object created" << std::endl;
 
     lcd = new LCD();
-    #ifndef _NOLCD
+#ifndef _NOLCD
     lcd->setup();
-    #endif
+#endif
 
     stage = Default;
     index = 0;
 
-    #ifdef _KEYBOARD
-        kb = new Keyboard();
-    #endif
+#ifdef _KEYBOARD
+    kb = new Keyboard();
+#endif
 }
 
+<<<<<<< HEAD
 
 Crutch::~Crutch()
 {
+=======
+Crutch::~Crutch() {
+>>>>>>> 53d62c3d86bcbfc3d51db4dfab0d1c2d27e6c79f
     lcd->~LCD();
 
     std::cout << "Crutch object deleted" << std::endl;
 }
 
-void Crutch::initCrutch()
-{
+void Crutch::initCrutch() {
     lastState = Error;
     currState = Error;
 
+<<<<<<< HEAD
     lastNextMove = RobotMode::DWNSTAIR; // This is irrelevant - just needed to make sure that it prints to the screen on the first press
+=======
+    lastNextMove = RobotMode::SITDWN;  // This is irrelevant - just needed to make sure that it prints to the screen on the first press
+>>>>>>> 53d62c3d86bcbfc3d51db4dfab0d1c2d27e6c79f
     nextMove = RobotMode::NORMALWALK;
-    #ifndef _NOLCD
+#ifndef _NOLCD
     lcd->commControlOn();
-    #endif
+#endif
 }
 
-void Crutch::run()
-{
+void Crutch::run() {
     // Take the current state from the object dictionary - this is passed on from the OD on the Main Beaglebone
     currState = static_cast<SMState>(CO_OD_RAM.currentState);
-    
 
-     // This is a record of the number of iterations of this device - not currently used
-     // Could be used to detect a long press though. 
+    // This is a record of the number of iterations of this device - not currently used
+    // Could be used to detect a long press though.
     incrementCount();
-    
+
     // Poll the buttons
     updateButtons();
 
@@ -110,19 +115,16 @@ void Crutch::run()
                 CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
             }           
         }
-    }
-    else
-    {
+    } else {
         // If not in a stationary state, just map the GoButton to to the ExoBeagle OD
         CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
     }
 
-    #ifndef _NOLCD
-    if (!lcd->isQueueEmpty())
-    {
+#ifndef _NOLCD
+    if (!lcd->isQueueEmpty()) {
         lcd->sendNextCommand();
     }
-    #endif
+#endif
 }
 
 void Crutch::printCSNM()
@@ -145,39 +147,34 @@ void Crutch::printCSNM()
             // If the selected move has changed, update the selected move
             #ifndef _NOLCD
             lcd->printNextMove(movementToString[nextMove]);
-            #endif
+#endif
             //sleep(1);
             std::cout << "Next Move: " << movementToString[nextMove] << std::endl;
             lastNextMove = nextMove;
         }
-        
-        if (lastStage != stage){
-            #ifndef _NOLCD
+
+        if (lastStage != stage) {
+#ifndef _NOLCD
             lcd->printStage(stage);
-            #endif
+#endif
             std::cout << "Stage: " << stage << std::endl;
             lastStage = stage;
         }
     }
 }
-void Crutch::setHeartBeat(int val)
-{
+void Crutch::setHeartBeat(int val) {
 }
-void Crutch::setNextMotion(int val)
-{
+void Crutch::setNextMotion(int val) {
     // CO_OD_RAM.nextMovement = val;
 }
-void Crutch::setGreenButon(int val)
-{
+void Crutch::setGreenButon(int val) {
     // CO_OD_RAM.goButton = val;
 }
-int Crutch::getCurrentMotion()
-{
+int Crutch::getCurrentMotion() {
     // retrun CO_OD_RAM.currentMotion;
     return currState;
 }
-int Crutch::getCurrentState()
-{
+int Crutch::getCurrentState() {
     return currState;
 }
 
@@ -209,12 +206,9 @@ void Crutch::testOD()
     }
 }*/
 
-void Crutch::printVector(vector<vector<std::string>> const &mat)
-{
-    for (vector<std::string> row : mat)
-    {
-        for (std::string val : row)
-        {
+void Crutch::printVector(vector<vector<std::string>> const &mat) {
+    for (vector<std::string> row : mat) {
+        for (std::string val : row) {
             cout << val << " ";
         }
         cout << '\n';
@@ -262,8 +256,7 @@ void Crutch::printVector(vector<vector<std::string>> const &mat)
     indexMap[6] = 2;
 **/
 
-bool Crutch::isStationaryState(SMState state)
-{
+bool Crutch::isStationaryState(SMState state) {
     return stateStationaryStatus[state];
 }
 
@@ -291,19 +284,15 @@ void Crutch::updateButtons()
     #endif
 }
 
-bool Crutch::checkButton(std::string path)
-{
+bool Crutch::checkButton(std::string path) {
     char value;
     std::ifstream stream(path);
     stream >> value;
     stream.close();
 
-    if (value != '1')
-    {
+    if (value == '1') {
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
@@ -328,8 +317,8 @@ void Crutch::updateStageExit(){
 	updateIndex();
 }
 */
-void Crutch::decrementIndex(){
-    index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
+void Crutch::decrementIndex() {
+    index = (index < 1) ? index = stageMovementList[stage].size() - 1 : index - 1;
 
     /** Prevent the following: 
         - If sitting, only option is to stand up, search for that entry in the list
@@ -361,4 +350,3 @@ void Crutch::incrementIndex(){
         index = (index +1) % stageMovementList[stage].size();
     }  
 }
-
