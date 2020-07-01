@@ -20,9 +20,6 @@ Crutch::Crutch(/* args */)
 
     stage = Default;
     index = 1;
-    choosingMove = 0;
-    feetTogether = 1;
-
 
     #ifdef _KEYBOARD
         kb = new Keyboard();
@@ -39,7 +36,8 @@ Crutch::~Crutch()
 void Crutch::initCrutch()
 {
     lastState = Error;
-    nextMove = Normal;
+    currState = Error;
+    nextMove = RobotMode::NORMALWALK;
     #ifndef _NOLCD
     lcd->commControlOn();
     #endif
@@ -67,19 +65,12 @@ void Crutch::run()
     	}*/
         if (nextBut && !prevNextBut)
         {
-        	index = (index +1) % stageMovementList[stage].size();
+        	incrementIndex();
             nextMove = stageMovementList[stage][index];
         }
         if (lastBut && !prevLastBut)
         {
-           if (index < 1)
-            {
-            	index = stageMovementList[stage].size() - 1;
-            }
-            else
-            {
-            	index -= 1;
-            }
+            decrementIndex();
             nextMove = stageMovementList[stage][index];
         }
         prevNextBut = nextBut;
@@ -88,7 +79,7 @@ void Crutch::run()
         // Check if the Go Button has been pressed
         if (goBut)
         {
-            if (nextMove == CO_OD_RAM.currentMovement)
+            if (nextMove == static_cast<RobotMode>(CO_OD_RAM.currentMovement))
             {
                 // If the movement set on the ExoBeagle is the same as the one on the screen,
                 // Send the go button status on the OD to true 
@@ -333,65 +324,55 @@ void Crutch::updateStageExit(){
 }
 */
 void Crutch::decrementIndex(){
-	if (index <= 1)
-	{
-		index = 11;
-		nextMove = stageMovementList[stage][index];
-	}
-	else
-	{
-		index -= 1;
-		nextMove = stageMovementList[stage][index];
-	}
-	/*
-	 * for limiting options whilst feet are seperated
-	if (feetTogether){
-		if (index <= 1)
-		{
-			index = 11;
-			nextMove = stageMap[stage][index];
-		}
-		else
-		{
-			index -= 1;
-			nextMove = stageMap[stage][index];
-		}
-	}
-	else if (!feetTogether){
-		if (index <= 1){
-			index = 11;
-			nextMove = stageMap[stage][index];
-		}
-		else if (4 < index && index < 8){
-			index = 4;
-		}
-		else{
-			index -= 1;
-		}
-	}
-	*/
+    index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
+
+    std::cout << currState << " " << SMState::Sitting << " " << (currState == SMState::Sitting) << std::endl;
+
+    // If sitting, only option is to stand up, search for that entry in the list
+	while (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP){
+        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
+    }
+
+    // Only allow stand up in the sitting state
+	while (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP){
+        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
+    }    
+
+    // To only allow sitting when feet are together
+    while (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing){
+        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
+    }  
+
+    // To prevent a Feet Together Movement when feet are already together
+	while (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG){
+        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;;
+    }
 }
 
 void Crutch::incrementIndex(){
-	index = index % 11 + 1;
-	nextMove = stageMovementList[stage][index];
-	/*
-	 * for limiting options whilst feet are seperated
-	if (feetTogether){
-		index = index % 11 + 1;
-		nextMove = stageMap[stage][index];
+	index = (index +1) % stageMovementList[stage].size();
+	
+
+    std::cout << currState << " " << SMState::Sitting <<  " " << (currState == SMState::Sitting) << std::endl;
+
+    // If sitting, only option is to stand up, search for that entry in the list
+	while (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP){
+        index = (index +1) % stageMovementList[stage].size();
 	}
-	else if (!feetTogether){
-		if (index > 4){
-			index = 8;
-		}
-		else if (index > 10){
-			index = 1;
-		}
-		else{
-			index += 1;
-		}
-	}
-	*/
+
+    // Only allow stand up in the sitting state
+	while (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP){
+        index = (index +1) % stageMovementList[stage].size();
+    }  
+
+    // To only allow sitting when feet are together
+    while (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing){
+        index = (index +1) % stageMovementList[stage].size();
+    }  
+
+    // To prevent a Feet Together Movement when feet are already together
+	while (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG && stageMovementList[stage][index] == RobotMode::STNDUP){
+        index = (index +1) % stageMovementList[stage].size();
+    }
 }
 

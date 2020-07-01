@@ -31,7 +31,26 @@
 using namespace std;
 
 
-enum MovementType{Normal, Backstep, FeetTogether, UpStairs, DownStairs, UpSlope, DownSlope, Uneven, SitDown, StandUp }; 
+enum class RobotMode {
+    NORMALWALK,
+    SITDWN,
+    STNDUP,
+    UPSTAIR,
+    DWNSTAIR,
+    TILTUP,
+    TILTDWN,
+    BKSTEP,
+    FTTG,
+    UNEVEN,
+    INITIAL,
+    ERROR,
+};
+
+
+// Incompatible state:Movement Pairs:
+// Sitting -> can only stand
+// Feet Together -> only when not in standing
+
 enum SMState{Error, Init, LeftForward, RightForward, Standing, Sitting, SittingDown, StandingUp, StepFirstL, StepFirstR, StepLastL, StepLastR, StepL, StepR}; 
 enum Stage{Default, UnevenGnd, Stairs, Tilt, Ramp};
 
@@ -55,17 +74,17 @@ static std::map <SMState, bool> stateStationaryStatus = {
 
 
 /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
-static std::map<MovementType, std::string> movementToString = {
-    {Normal, "Normal"},
-    {Backstep, "Backstep"},
-    {FeetTogether, "Feet Together"}, 
-    {UpStairs, "Up stairs"}, 
-    {DownStairs, "Down stairs"},
-    {UpSlope, "Up slope"},
-    {DownSlope, "Down slope"},
-    {Uneven, "Uneven"},
-    {SitDown, "Sit Down"}, 
-    {StandUp, "Stand Up"}
+static std::map<RobotMode, std::string> movementToString = {
+    {RobotMode::NORMALWALK, "Normal"},
+    {RobotMode::BKSTEP, "Backstep"},
+    {RobotMode::FTTG, "Feet Together"}, 
+    {RobotMode::UPSTAIR, "Up stairs"}, 
+    {RobotMode::DWNSTAIR, "Down stairs"},
+    {RobotMode::TILTUP, "Up slope"},
+    {RobotMode::TILTDWN, "Down slope"},
+    {RobotMode::UNEVEN, "Uneven"},
+    {RobotMode::SITDWN, "Sit Down"}, 
+    {RobotMode::STNDUP, "Stand Up"}
 };
 
 static std::map<SMState, std::string> stateToString = {
@@ -85,12 +104,14 @@ static std::map<SMState, std::string> stateToString = {
     {StepR, "Step Right"}
 };
 
-static std::map<Stage, std::vector<MovementType>> stageMovementList = {
-    {Default, {Normal, DownSlope, Backstep, FeetTogether, Normal, UpStairs, DownStairs, StandUp, UpSlope, Uneven}},
-    {UnevenGnd, {Normal, DownSlope, StandUp, Backstep, FeetTogether, UpStairs, DownStairs, Normal, UpSlope, Uneven}},
-    {Stairs, {Normal, FeetTogether, Backstep, Normal, UpStairs, DownStairs, StandUp, UpSlope, DownSlope, Uneven}},
-    {Tilt, {Normal, Normal, Backstep, FeetTogether, UpStairs, DownStairs, StandUp, UpSlope, DownSlope, Uneven}},
-    {Ramp, {Normal, Uneven, DownStairs, Backstep, FeetTogether, Normal, StandUp, UpSlope, DownSlope, Uneven}}
+
+// Note: Every stage MUST have RobotMode::STNDUP in it
+static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
+    {Default, {RobotMode::NORMALWALK, RobotMode::TILTDWN, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::NORMALWALK, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::UNEVEN, RobotMode::SITDWN}},
+    {UnevenGnd, {RobotMode::NORMALWALK, RobotMode::TILTDWN, RobotMode::STNDUP, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::NORMALWALK, RobotMode::TILTUP, RobotMode::UNEVEN, RobotMode::SITDWN}},
+    {Stairs, {RobotMode::NORMALWALK, RobotMode::FTTG, RobotMode::BKSTEP, RobotMode::NORMALWALK, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
+    {Tilt, {RobotMode::NORMALWALK, RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
+    {Ramp, {RobotMode::NORMALWALK, RobotMode::DWNSTAIR, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}}
 };
 
 
@@ -100,23 +121,21 @@ class Crutch {
     /* Jagged array for Current state, next motion relationship */
     // walking, standing and sitting w/ their Next motion lists
     // vector<vector<std::string>> nextMotion{
-    //     {"normal", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
-    //     {"sit Down", "normal", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
+    //     {"RobotMode::NORMALWALK", "feet together", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
+    //     {"sit Down", "RobotMode::NORMALWALK", "backstep", "up stairs", "down stairs", "up slope", "down slope", "uneven"},
     //     {"Stand Up"}};
     /* data */
     SMState currState;
     SMState lastState;
 
-    MovementType nextMove;
-    MovementType lastNextMove;
+    RobotMode nextMove;
+    RobotMode lastNextMove;
 
     Stage stage;
     Stage lastStage;
 
     int index;
-    int choosingMove;
-    int feetTogether;
-
+    
     // Button Variables
     bool nextBut;
     bool prevNextBut; // for debounce
