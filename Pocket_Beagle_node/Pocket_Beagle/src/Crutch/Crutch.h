@@ -142,7 +142,7 @@ class Crutch {
     bool prevLastBut = false; // for debounce
     bool goBut = false;
 
-    bool waitGoRelease = false;
+    bool waitGoRelease = true;
 
 
     std::string nextButPath = "/sys/class/gpio/gpio59/value";

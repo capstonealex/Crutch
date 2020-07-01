@@ -26,13 +26,9 @@ Crutch::Crutch(/* args */) {
 #endif
 }
 
-<<<<<<< HEAD
 
 Crutch::~Crutch()
 {
-=======
-Crutch::~Crutch() {
->>>>>>> 53d62c3d86bcbfc3d51db4dfab0d1c2d27e6c79f
     lcd->~LCD();
 
     std::cout << "Crutch object deleted" << std::endl;
@@ -42,11 +38,7 @@ void Crutch::initCrutch() {
     lastState = Error;
     currState = Error;
 
-<<<<<<< HEAD
     lastNextMove = RobotMode::DWNSTAIR; // This is irrelevant - just needed to make sure that it prints to the screen on the first press
-=======
-    lastNextMove = RobotMode::SITDWN;  // This is irrelevant - just needed to make sure that it prints to the screen on the first press
->>>>>>> 53d62c3d86bcbfc3d51db4dfab0d1c2d27e6c79f
     nextMove = RobotMode::NORMALWALK;
 #ifndef _NOLCD
     lcd->commControlOn();
