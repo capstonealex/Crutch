@@ -42,8 +42,7 @@ enum class RobotMode {
     BKSTEP,
     FTTG,
     UNEVEN,
-    INITIAL,
-    ERROR,
+    INITIAL
 };
 
 
@@ -107,7 +106,7 @@ static std::map<SMState, std::string> stateToString = {
 
 // Note: Every stage MUST have RobotMode::STNDUP in it
 static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
-    {Default, {RobotMode::NORMALWALK, RobotMode::TILTDWN, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::NORMALWALK, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::UNEVEN, RobotMode::SITDWN}},
+    {Default, {RobotMode::NORMALWALK,  RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR,  RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
     {UnevenGnd, {RobotMode::NORMALWALK, RobotMode::TILTDWN, RobotMode::STNDUP, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::NORMALWALK, RobotMode::TILTUP, RobotMode::UNEVEN, RobotMode::SITDWN}},
     {Stairs, {RobotMode::NORMALWALK, RobotMode::FTTG, RobotMode::BKSTEP, RobotMode::NORMALWALK, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
     {Tilt, {RobotMode::NORMALWALK, RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
@@ -135,13 +134,16 @@ class Crutch {
     Stage lastStage;
 
     int index;
-    
+
     // Button Variables
-    bool nextBut;
-    bool prevNextBut; // for debounce
-    bool lastBut;
-    bool prevLastBut; // for debounce
-    bool goBut;
+    bool nextBut = false;
+    bool prevNextBut = false; // for debounce
+    bool lastBut = false;
+    bool prevLastBut = false; // for debounce
+    bool goBut = false;
+
+    bool waitGoRelease = false;
+
 
     std::string nextButPath = "/sys/class/gpio/gpio59/value";
     std::string lastButPath = "/sys/class/gpio/gpio58/value";
@@ -184,8 +186,6 @@ class Crutch {
     int getCurrentState();
     //For Testing w.o. object Dicitonary
     void crutchTest();
-    void setCurrentState(SMState state);
-    // void setCurrentState();
     void incrementCount();
     int counter;
     int stateIndex;

@@ -19,12 +19,13 @@ Crutch::Crutch(/* args */)
     #endif
 
     stage = Default;
-    index = 1;
+    index = 0;
 
     #ifdef _KEYBOARD
         kb = new Keyboard();
     #endif
 }
+
 
 Crutch::~Crutch()
 {
@@ -38,7 +39,7 @@ void Crutch::initCrutch()
     lastState = Error;
     currState = Error;
 
-    lastNextMove = RobotMode::SITDWN; // This is irrelevant - just needed to make sure that it prints to the screen on the first press
+    lastNextMove = RobotMode::DWNSTAIR; // This is irrelevant - just needed to make sure that it prints to the screen on the first press
     nextMove = RobotMode::NORMALWALK;
     #ifndef _NOLCD
     lcd->commControlOn();
@@ -61,45 +62,53 @@ void Crutch::run()
     // If current State is a stationary State
     if (isStationaryState(currState))
     {
-        // Cycle forward with debounce
-    	/*if (!choosingMove){
-    		choosingMove = 1;
-    	}*/
-        if (nextBut && !prevNextBut)
-        {
-        	incrementIndex();
-            nextMove = stageMovementList[stage][index];
+        if(!isStationaryState(lastState)){
+            // We have just finished a move - don't do anything until go is released
+            std::cout << "Finished Move" << std::endl;
+            waitGoRelease = true;
+            CO_OD_RAM.goButton = static_cast<uint16_t>(false);
         }
-        if (lastBut && !prevLastBut)
-        {
-            decrementIndex();
-            nextMove = stageMovementList[stage][index];
-        }
-        prevNextBut = nextBut;
-        prevLastBut = lastBut;
-
-        // Check if the Go Button has been pressed
-        if (goBut)
-        {
-            if (nextMove == static_cast<RobotMode>(CO_OD_RAM.currentMovement))
+        if (waitGoRelease){
+       // Waiting for Go Button to be released
+            if (!goBut){
+                std::cout << "Go Released!" << std::endl;
+                waitGoRelease = false;
+            }
+        }else {
+            if (nextBut && !prevNextBut)
             {
-                // If the movement set on the ExoBeagle is the same as the one on the screen,
-                // Send the go button status on the OD to true 
-                CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+                incrementIndex();
+                nextMove = stageMovementList[stage][index];
+            }
+            if (lastBut && !prevLastBut)
+            {
+                decrementIndex();
+                nextMove = stageMovementList[stage][index];
+            }
+            prevNextBut = nextBut;
+            prevLastBut = lastBut;
+
+            // Check if the Go Button has been pressed
+            if (goBut)
+            {
+                if (nextMove == static_cast<RobotMode>(CO_OD_RAM.currentMovement))
+                {
+                    // If the movement set on the ExoBeagle is the same as the one on the screen,
+                    // Send the go button status on the OD to true 
+                    CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+                }
+                else
+                {
+                    // If they are not the same, then send the next movement across to the exoskeleton
+                    // and do not update the go button on the exo side
+                    CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
+                }
             }
             else
             {
-                // If they are not the same, then send the next movement across to the exoskeleton
-                // and do not update the go button on the exo side
-                CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
-
-                //choosingMove = 0;
-            }
-        }
-        else
-        {
-            // If the GoButton is not pressed, set the go button to false always
-            CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+                // If the GoButton is not pressed, set the go button to false always
+                CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+            }           
         }
     }
     else
@@ -118,20 +127,19 @@ void Crutch::run()
 
 void Crutch::printCSNM()
 {
+     // Only update the screen if we are in a stationary state
+    if (currState != lastState)
+    {
+        // If the state has changed - update the screen to show the state
+        #ifndef _NOLCD
+        lcd->printCurrState(stateToString[currState]);
+        #endif
+        //sleep(1);
+        std::cout << "Curr State: " << stateToString[currState] << std::endl;
+        lastState = currState;
+    }
     if (isStationaryState(currState))
     {
-        // Only update the screen if we are in a stationary state
-        if (currState != lastState)
-        {
-            // If the state has changed - update the screen to show the state
-            #ifndef _NOLCD
-            lcd->printCurrState(stateToString[currState]);
-            #endif
-            //sleep(1);
-            std::cout << "Curr State: " << stateToString[currState] << std::endl;
-            lastState = currState;
-        }
-
         if (nextMove != lastNextMove)
         {
             // If the selected move has changed, update the selected move
@@ -151,9 +159,6 @@ void Crutch::printCSNM()
             lastStage = stage;
         }
     }
-
-    // std::string name = nextMotion[RIGHT_FORWARD][3];
-    // std::cout << nextMotion[RIGHT_FORWARD][3] << " : " << stateToIntODMap[name] << std::endl;
 }
 void Crutch::setHeartBeat(int val)
 {
@@ -175,17 +180,7 @@ int Crutch::getCurrentState()
 {
     return currState;
 }
-// void Crutch::setCurrentState()
-// {
-//     currState = CO_OD_RAM.currentState;
-// }
 
-// TESTING LCD
-void Crutch::setCurrentState(SMState state)
-{
-    // currState = CO_OD_RAM.currentState;
-    currState = state;
-}
 void Crutch::incrementCount()
 {
     counter++;
@@ -193,7 +188,6 @@ void Crutch::incrementCount()
 // TEST BBB OD
 void Crutch::testOD()
 {
-    // setCurrentState();
     std::cout << "Current state" << stateToString[currState] << std::endl;
     // TEST CURRENT MOTION
     // std::cout << "Current MOTION" << lcd->intToStateODMap[getCurrentMotion()] << std::endl;
@@ -209,7 +203,6 @@ void Crutch::testOD()
         {
             stateIndex = 1;
         }
-        setCurrentState(stateIndex);
 
         index = index % 11 + 1;
 
@@ -280,9 +273,17 @@ void Crutch::updateButtons()
         kb->updateInput();
         nextBut = kb->getA();
         lastBut = kb->getS();
+        
         if (kb->getD()){
             goBut = !goBut;
+            if (goBut){
+                std::cout << "Go Pressed" << std::endl;
+            } else{
+                std::cout << "Go Unpressed" << std::endl;
+            }
         }
+
+
     #else
         nextBut = checkButton(nextButPath);
         lastBut = checkButton(lastButPath);
@@ -330,47 +331,34 @@ void Crutch::updateStageExit(){
 void Crutch::decrementIndex(){
     index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
 
-    // If sitting, only option is to stand up, search for that entry in the list
-	while (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP){
+    /** Prevent the following: 
+        - If sitting, only option is to stand up, search for that entry in the list
+        - Only allow stand up in the sitting state
+        - To only allow sitting when feet are together
+        - To prevent a Feet Together Movement when feet are already together
+    */
+	while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) || 
+            (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
+            (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) || 
+            (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG) ){
         index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
-    }
-
-    // Only allow stand up in the sitting state
-	while (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP){
-        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
-    }    
-
-    // To only allow sitting when feet are together
-    while (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing){
-        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
-    }  
-
-    // To prevent a Feet Together Movement when feet are already together
-	while (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG){
-        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;;
-    }
+    }   
 }
 
 void Crutch::incrementIndex(){
 	index = (index +1) % stageMovementList[stage].size();
-    // If sitting, only option is to stand up, search for that entry in the list
-	while (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP){
-        index = (index +1) % stageMovementList[stage].size();
-	}
 
-    // Only allow stand up in the sitting state
-	while (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP){
+    /** Prevent the following: 
+        - If sitting, only option is to stand up, search for that entry in the list
+        - Only allow stand up in the sitting state
+        - To only allow sitting when feet are together
+        - To prevent a Feet Together Movement when feet are already together
+    */
+	while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) || 
+            (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
+            (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) || 
+            (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG) ){
         index = (index +1) % stageMovementList[stage].size();
     }  
-
-    // To only allow sitting when feet are together
-    while (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing){
-        index = (index +1) % stageMovementList[stage].size();
-    }  
-
-    // To prevent a Feet Together Movement when feet are already together
-	while (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG && stageMovementList[stage][index] == RobotMode::STNDUP){
-        index = (index +1) % stageMovementList[stage].size();
-    }
 }
 
