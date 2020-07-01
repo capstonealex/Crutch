@@ -37,6 +37,8 @@ void Crutch::initCrutch()
 {
     lastState = Error;
     currState = Error;
+
+    lastNextMove = RobotMode::SITDWN; // This is irrelevant - just needed to make sure that it prints to the screen on the first press
     nextMove = RobotMode::NORMALWALK;
     #ifndef _NOLCD
     lcd->commControlOn();
@@ -278,7 +280,9 @@ void Crutch::updateButtons()
         kb->updateInput();
         nextBut = kb->getA();
         lastBut = kb->getS();
-        goBut = kb->getD();
+        if (kb->getD()){
+            goBut = !goBut;
+        }
     #else
         nextBut = checkButton(nextButPath);
         lastBut = checkButton(lastButPath);
@@ -326,8 +330,6 @@ void Crutch::updateStageExit(){
 void Crutch::decrementIndex(){
     index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
 
-    std::cout << currState << " " << SMState::Sitting << " " << (currState == SMState::Sitting) << std::endl;
-
     // If sitting, only option is to stand up, search for that entry in the list
 	while (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP){
         index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
@@ -351,10 +353,6 @@ void Crutch::decrementIndex(){
 
 void Crutch::incrementIndex(){
 	index = (index +1) % stageMovementList[stage].size();
-	
-
-    std::cout << currState << " " << SMState::Sitting <<  " " << (currState == SMState::Sitting) << std::endl;
-
     // If sitting, only option is to stand up, search for that entry in the list
 	while (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP){
         index = (index +1) % stageMovementList[stage].size();
