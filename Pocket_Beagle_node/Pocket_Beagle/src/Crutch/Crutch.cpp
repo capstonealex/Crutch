@@ -27,6 +27,7 @@ Crutch::Crutch(/* args */) {
 }
 
 
+
 Crutch::~Crutch()
 {
     lcd->~LCD();
@@ -56,8 +57,30 @@ void Crutch::run() {
     // Poll the buttons
     updateButtons();
 
+    if(currState == SMState::Init){
+        if(nextBut && lastBut){
+            nextMove = RobotMode::INITIAL;
+            std::cout<< "Start Buttons Pressed" << std::endl;
+            CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
+        }
+
+        #ifdef _KEYBOARD
+        if(kb->getW()){
+            nextMove = RobotMode::INITIAL;
+            std::cout<< "Start Buttons Pressed" << std::endl;
+            CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
+        }
+        #endif
+
+        if (nextMove == RobotMode::INITIAL){
+            if (goBut){
+                std::cout << "Send GO" << std::endl;
+            }
+            CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+        }
+    }
     // If current State is a stationary State
-    if (isStationaryState(currState))
+    else if (isStationaryState(currState))
     {
         if(!isStationaryState(lastState)){
             // We have just finished a move - don't do anything until go is released
@@ -66,7 +89,7 @@ void Crutch::run() {
             CO_OD_RAM.goButton = static_cast<uint16_t>(false);
         }
         if (waitGoRelease){
-       // Waiting for Go Button to be released
+            // Waiting for Go Button to be released
             if (!goBut){
                 std::cout << "Go Released!" << std::endl;
                 waitGoRelease = false;
@@ -92,7 +115,7 @@ void Crutch::run() {
                 {
                     // If the movement set on the ExoBeagle is the same as the one on the screen,
                     // Send the go button status on the OD to true 
-                    CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+                    CO_OD_RAM.goButton = static_cast<uint16_t>(true);
                 }
                 else
                 {
@@ -104,7 +127,7 @@ void Crutch::run() {
             else
             {
                 // If the GoButton is not pressed, set the go button to false always
-                CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
+                CO_OD_RAM.goButton = static_cast<uint16_t>(false);
             }           
         }
     } else {
@@ -132,27 +155,25 @@ void Crutch::printCSNM()
         std::cout << "Curr State: " << stateToString[currState] << std::endl;
         lastState = currState;
     }
-    if (isStationaryState(currState))
+    if (nextMove != lastNextMove)
     {
-        if (nextMove != lastNextMove)
-        {
-            // If the selected move has changed, update the selected move
-            #ifndef _NOLCD
-            lcd->printNextMove(movementToString[nextMove]);
-#endif
-            //sleep(1);
-            std::cout << "Next Move: " << movementToString[nextMove] << std::endl;
-            lastNextMove = nextMove;
-        }
-
-        if (lastStage != stage) {
-#ifndef _NOLCD
-            lcd->printStage(stage);
-#endif
-            std::cout << "Stage: " << stage << std::endl;
-            lastStage = stage;
-        }
+        // If the selected move has changed, update the selected move
+        #ifndef _NOLCD
+        lcd->printNextMove(movementToString[nextMove]);
+        #endif
+        //sleep(1);
+        std::cout << "Next Move: " << movementToString[nextMove] << std::endl;
+        lastNextMove = nextMove;
     }
+
+    if (lastStage != stage) {
+        #ifndef _NOLCD
+        lcd->printStage(stage);
+        #endif
+        std::cout << "Stage: " << stage << std::endl;
+        lastStage = stage;
+    }
+
 }
 void Crutch::setHeartBeat(int val) {
 }

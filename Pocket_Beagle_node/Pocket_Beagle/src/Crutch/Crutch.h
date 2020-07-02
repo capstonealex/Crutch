@@ -50,13 +50,14 @@ enum class RobotMode {
 // Sitting -> can only stand
 // Feet Together -> only when not in standing
 
-enum SMState{Error, Init, LeftForward, RightForward, Standing, Sitting, SittingDown, StandingUp, StepFirstL, StepFirstR, StepLastL, StepLastR, StepL, StepR}; 
+enum SMState{Error, Init, InitSitting, LeftForward, RightForward, Standing, Sitting, SittingDown, StandingUp, StepFirstL, StepFirstR, StepLastL, StepLastR, StepL, StepR}; 
 enum Stage{Default, UnevenGnd, Stairs, Tilt, Ramp};
 
 
 static std::map <SMState, bool> stateStationaryStatus = {
     {Error, true},
     {Init, true},
+    {InitSitting, false},
     {LeftForward, true},
     {RightForward, true},
     {Standing, true}, 
@@ -83,12 +84,14 @@ static std::map<RobotMode, std::string> movementToString = {
     {RobotMode::TILTDWN, "Down slope"},
     {RobotMode::UNEVEN, "Uneven"},
     {RobotMode::SITDWN, "Sit Down"}, 
-    {RobotMode::STNDUP, "Stand Up"}
+    {RobotMode::STNDUP, "Stand Up"},
+    {RobotMode::INITIAL, "Inital Sit"}
 };
 
 static std::map<SMState, std::string> stateToString = {
     {Error, "Error"},
     {Init, "Init"},
+    {InitSitting, "InitSitting"},
     {LeftForward, "Left Forward"},
     {RightForward, "Right Forward"}, 
     {Standing, "Standing"}, 

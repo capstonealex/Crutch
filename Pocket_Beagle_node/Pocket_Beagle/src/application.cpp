@@ -34,9 +34,6 @@ Crutch exoCrutch;
 void app_programStart(void)
 {
     // Testing LCD TRANSITIONS
-    exoCrutch.stateIndex = 1;
-    exoCrutch.setCurrentState(Init);
-    CO_OD_RAM.currentState = 4;
     exoCrutch.initCrutch();
     exoCrutch.counter = 0;
 
