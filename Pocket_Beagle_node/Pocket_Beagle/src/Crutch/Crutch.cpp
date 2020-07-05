@@ -94,18 +94,15 @@ void Crutch::run() {
             // Start timer when button is pressed
             if (nextBut && !prevNextBut) {
                 initNextButCount = counter;
-                // std::cout << "COUNTING NEXT BUTTON" << std::endl;  // testing rising edge trigger
             }
             if (lastBut && !prevLastBut) {
                 initLastButCount = counter;
-                // std::cout << "COUNTING LAST BUTTON" << std::endl; // testing rising edge trigger
             }
 
             // Execute logic when button is released
             if (!nextBut && prevNextBut) {
                 // Upon release, determine how many seconds the button was pressed for
                 pressTime = (counter - initNextButCount) / CLK_FREQ;
-                //std::cout << "press time: " << pressTime << std::endl;  // testing timer
 
                 if (pressTime > LONG_PRESS_LENGTH) {
                     // If the button has been pressed for longer than the long press threshold,
@@ -120,7 +117,6 @@ void Crutch::run() {
             if (!lastBut && prevLastBut) {
                 // Upon release, determine how many seconds the button was pressed for
                 pressTime = (counter - initLastButCount) / CLK_FREQ;
-                //std::cout << "press time: " << pressTime << std::endl;  // testing timer
 
                 if (pressTime > LONG_PRESS_LENGTH) {
                     // If the button has been pressed for longer than the long press threshold,
