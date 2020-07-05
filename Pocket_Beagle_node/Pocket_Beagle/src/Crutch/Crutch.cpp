@@ -26,10 +26,7 @@ Crutch::Crutch(/* args */) {
 #endif
 }
 
-
-
-Crutch::~Crutch()
-{
+Crutch::~Crutch() {
     lcd->~LCD();
 
     std::cout << "Crutch object deleted" << std::endl;
@@ -39,7 +36,7 @@ void Crutch::initCrutch() {
     lastState = Error;
     currState = Error;
 
-    lastNextMove = RobotMode::DWNSTAIR; // This is irrelevant - just needed to make sure that it prints to the screen on the first press
+    lastNextMove = RobotMode::DWNSTAIR;  // This is irrelevant - just needed to make sure that it prints to the screen on the first press
     nextMove = RobotMode::NORMALWALK;
 #ifndef _NOLCD
     lcd->commControlOn();
@@ -57,78 +54,102 @@ void Crutch::run() {
     // Poll the buttons
     updateButtons();
 
-    if(currState == SMState::Init){
-        if(nextBut && lastBut){
+    if (currState == SMState::Init) {
+        if (nextBut && lastBut) {
             nextMove = RobotMode::INITIAL;
-            std::cout<< "Start Buttons Pressed" << std::endl;
+            std::cout << "Start Buttons Pressed" << std::endl;
             CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
         }
 
-        #ifdef _KEYBOARD
-        if(kb->getW()){
+#ifdef _KEYBOARD
+        if (kb->getW()) {
             nextMove = RobotMode::INITIAL;
-            std::cout<< "Start Buttons Pressed" << std::endl;
+            std::cout << "Start Buttons Pressed" << std::endl;
             CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
         }
-        #endif
+#endif
 
-        if (nextMove == RobotMode::INITIAL){
-            if (goBut){
+        if (nextMove == RobotMode::INITIAL) {
+            if (goBut) {
                 std::cout << "Send GO" << std::endl;
             }
             CO_OD_RAM.goButton = static_cast<uint16_t>(goBut);
         }
     }
     // If current State is a stationary State
-    else if (isStationaryState(currState))
-    {
-        if(!isStationaryState(lastState)){
+    else if (isStationaryState(currState)) {
+        if (!isStationaryState(lastState)) {
             // We have just finished a move - don't do anything until go is released
             std::cout << "Finished Move" << std::endl;
             waitGoRelease = true;
             CO_OD_RAM.goButton = static_cast<uint16_t>(false);
         }
-        if (waitGoRelease){
+        if (waitGoRelease) {
             // Waiting for Go Button to be released
-            if (!goBut){
+            if (!goBut) {
                 std::cout << "Go Released!" << std::endl;
                 waitGoRelease = false;
             }
-        }else {
-            if (nextBut && !prevNextBut)
-            {
-                incrementIndex();
-                nextMove = stageMovementList[stage][index];
+        } else {
+            // Start timer when button is pressed
+            if (nextBut && !prevNextBut) {
+                initNextButCount = counter;
+                // std::cout << "COUNTING NEXT BUTTON" << std::endl;  // testing rising edge trigger
             }
-            if (lastBut && !prevLastBut)
-            {
-                decrementIndex();
-                nextMove = stageMovementList[stage][index];
+            if (lastBut && !prevLastBut) {
+                initLastButCount = counter;
+                // std::cout << "COUNTING LAST BUTTON" << std::endl; // testing rising edge trigger
+            }
+
+            // Execute logic when button is released
+            if (!nextBut && prevNextBut) {
+                // Upon release, determine how many seconds the button was pressed for
+                pressTime = (counter - initNextButCount) / CLK_FREQ;
+                //std::cout << "press time: " << pressTime << std::endl;  // testing timer
+
+                if (pressTime > LONG_PRESS_LENGTH) {
+                    // If the button has been pressed for longer than the long press threshold,
+                    // execute long press logic
+                    longNextButLogic();
+                } else {
+                    // If the button has not been pressed long enough, execute short press logic
+                    incrementIndex();
+                    nextMove = stageMovementList[stage][index];
+                }
+            }
+            if (!lastBut && prevLastBut) {
+                // Upon release, determine how many seconds the button was pressed for
+                pressTime = (counter - initLastButCount) / CLK_FREQ;
+                //std::cout << "press time: " << pressTime << std::endl;  // testing timer
+
+                if (pressTime > LONG_PRESS_LENGTH) {
+                    // If the button has been pressed for longer than the long press threshold,
+                    // execute long press logic
+                    longLastButLogic();
+                } else {
+                    // If the button has not been pressed long enough, execute short press logic
+                    decrementIndex();
+                    nextMove = stageMovementList[stage][index];
+                }
             }
             prevNextBut = nextBut;
             prevLastBut = lastBut;
 
             // Check if the Go Button has been pressed
-            if (goBut)
-            {
-                if (nextMove == static_cast<RobotMode>(CO_OD_RAM.currentMovement))
-                {
+            if (goBut) {
+                if (nextMove == static_cast<RobotMode>(CO_OD_RAM.currentMovement)) {
                     // If the movement set on the ExoBeagle is the same as the one on the screen,
-                    // Send the go button status on the OD to true 
+                    // Send the go button status on the OD to true
                     CO_OD_RAM.goButton = static_cast<uint16_t>(true);
-                }
-                else
-                {
+                } else {
                     // If they are not the same, then send the next movement across to the exoskeleton
                     // and do not update the go button on the exo side
                     CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
                 }
-            }
-            else
-            {
+            } else {
                 // If the GoButton is not pressed, set the go button to false always
                 CO_OD_RAM.goButton = static_cast<uint16_t>(false);
-            }           
+            }
         }
     } else {
         // If not in a stationary state, just map the GoButton to to the ExoBeagle OD
@@ -142,38 +163,34 @@ void Crutch::run() {
 #endif
 }
 
-void Crutch::printCSNM()
-{
-     // Only update the screen if we are in a stationary state
-    if (currState != lastState)
-    {
-        // If the state has changed - update the screen to show the state
-        #ifndef _NOLCD
+void Crutch::printCSNM() {
+    // Only update the screen if we are in a stationary state
+    if (currState != lastState) {
+// If the state has changed - update the screen to show the state
+#ifndef _NOLCD
         lcd->printCurrState(stateToString[currState]);
-        #endif
+#endif
         //sleep(1);
         std::cout << "Curr State: " << stateToString[currState] << std::endl;
         lastState = currState;
     }
-    if (nextMove != lastNextMove)
-    {
-        // If the selected move has changed, update the selected move
-        #ifndef _NOLCD
+    if (nextMove != lastNextMove) {
+// If the selected move has changed, update the selected move
+#ifndef _NOLCD
         lcd->printNextMove(movementToString[nextMove]);
-        #endif
+#endif
         //sleep(1);
         std::cout << "Next Move: " << movementToString[nextMove] << std::endl;
         lastNextMove = nextMove;
     }
 
     if (lastStage != stage) {
-        #ifndef _NOLCD
+#ifndef _NOLCD
         lcd->printStage(stage);
-        #endif
+#endif
         std::cout << "Stage: " << stage << std::endl;
         lastStage = stage;
     }
-
 }
 void Crutch::setHeartBeat(int val) {
 }
@@ -191,13 +208,11 @@ int Crutch::getCurrentState() {
     return currState;
 }
 
-void Crutch::incrementCount()
-{
+void Crutch::incrementCount() {
     counter++;
 }
 // TEST BBB OD
-void Crutch::testOD()
-{
+void Crutch::testOD() {
     std::cout << "Current state" << stateToString[currState] << std::endl;
     // TEST CURRENT MOTION
     // std::cout << "Current MOTION" << lcd->intToStateODMap[getCurrentMotion()] << std::endl;
@@ -273,28 +288,26 @@ bool Crutch::isStationaryState(SMState state) {
     return stateStationaryStatus[state];
 }
 
-void Crutch::updateButtons()
-{
-    #ifdef _KEYBOARD
-        kb->updateInput();
-        nextBut = kb->getA();
-        lastBut = kb->getS();
-        
-        if (kb->getD()){
-            goBut = !goBut;
-            if (goBut){
-                std::cout << "Go Pressed" << std::endl;
-            } else{
-                std::cout << "Go Unpressed" << std::endl;
-            }
+void Crutch::updateButtons() {
+#ifdef _KEYBOARD
+    kb->updateInput();
+    nextBut = kb->getA();
+    lastBut = kb->getS();
+
+    if (kb->getD()) {
+        goBut = !goBut;
+        if (goBut) {
+            std::cout << "Go Pressed" << std::endl;
+        } else {
+            std::cout << "Go Unpressed" << std::endl;
         }
+    }
 
-
-    #else
-        nextBut = checkButton(nextButPath);
-        lastBut = checkButton(lastButPath);
-        goBut = checkButton(goButPath);
-    #endif
+#else
+    nextBut = checkButton(nextButPath);
+    lastBut = checkButton(lastButPath);
+    goBut = checkButton(goButPath);
+#endif
 }
 
 bool Crutch::checkButton(std::string path) {
@@ -339,16 +352,16 @@ void Crutch::decrementIndex() {
         - To only allow sitting when feet are together
         - To prevent a Feet Together Movement when feet are already together
     */
-	while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) || 
-            (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
-            (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) || 
-            (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG) ){
-        index =  (index < 1) ? index = stageMovementList[stage].size() - 1 : index -1;
-    }   
+    while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) ||
+           (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
+           (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) ||
+           (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG)) {
+        index = (index < 1) ? index = stageMovementList[stage].size() - 1 : index - 1;
+    }
 }
 
-void Crutch::incrementIndex(){
-	index = (index +1) % stageMovementList[stage].size();
+void Crutch::incrementIndex() {
+    index = (index + 1) % stageMovementList[stage].size();
 
     /** Prevent the following: 
         - If sitting, only option is to stand up, search for that entry in the list
@@ -356,10 +369,20 @@ void Crutch::incrementIndex(){
         - To only allow sitting when feet are together
         - To prevent a Feet Together Movement when feet are already together
     */
-	while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) || 
-            (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
-            (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) || 
-            (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG) ){
-        index = (index +1) % stageMovementList[stage].size();
-    }  
+    while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) ||
+           (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
+           (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) ||
+           (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG)) {
+        index = (index + 1) % stageMovementList[stage].size();
+    }
+}
+
+// For forward cycling between stages
+void Crutch::longNextButLogic() {
+    std::cout << "LONG NEXT BUTTON HAS BEEN PRESSED" << std::endl;
+}
+
+// For backward cycling between stages
+void Crutch::longLastButLogic() {
+    std::cout << "LONG LAST BUTTON HAS BEEN PRESSED" << std::endl;
 }

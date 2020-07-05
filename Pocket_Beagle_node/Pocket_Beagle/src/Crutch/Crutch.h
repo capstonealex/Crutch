@@ -13,8 +13,11 @@
 #define STANDING 2
 #define SITTING 3
 
-#define _NOLCD
-#define _KEYBOARD
+#define CLK_FREQ 2000        // Operating frequency of the crutch 'run' function
+#define LONG_PRESS_LENGTH 2  // Number of seconds to hold button to execute long press logic
+
+// #define _NOLCD
+// #define _KEYBOARD
 
 #include <array>
 #include <map>
@@ -24,12 +27,10 @@
 #include "LCD.h"
 
 #ifdef _KEYBOARD
-    #include "Keyboard.h"
+#include "Keyboard.h"
 #endif
 
-
 using namespace std;
-
 
 enum class RobotMode {
     NORMALWALK,
@@ -45,22 +46,38 @@ enum class RobotMode {
     INITIAL
 };
 
-
 // Incompatible state:Movement Pairs:
 // Sitting -> can only stand
 // Feet Together -> only when not in standing
 
-enum SMState{Error, Init, InitSitting, LeftForward, RightForward, Standing, Sitting, SittingDown, StandingUp, StepFirstL, StepFirstR, StepLastL, StepLastR, StepL, StepR}; 
-enum Stage{Default, UnevenGnd, Stairs, Tilt, Ramp};
+enum SMState { Error,
+               Init,
+               InitSitting,
+               LeftForward,
+               RightForward,
+               Standing,
+               Sitting,
+               SittingDown,
+               StandingUp,
+               StepFirstL,
+               StepFirstR,
+               StepLastL,
+               StepLastR,
+               StepL,
+               StepR };
+enum Stage { Default,
+             UnevenGnd,
+             Stairs,
+             Tilt,
+             Ramp };
 
-
-static std::map <SMState, bool> stateStationaryStatus = {
+static std::map<SMState, bool> stateStationaryStatus = {
     {Error, true},
     {Init, true},
     {InitSitting, false},
     {LeftForward, true},
     {RightForward, true},
-    {Standing, true}, 
+    {Standing, true},
     {Sitting, true},
     {SittingDown, false},
     {StandingUp, false},
@@ -68,33 +85,30 @@ static std::map <SMState, bool> stateStationaryStatus = {
     {StepFirstR, false},
     {StepLastL, false},
     {StepLastR, false},
-    {StepL, false}, 
-    {StepR, false}
-};
-
+    {StepL, false},
+    {StepR, false}};
 
 /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
 static std::map<RobotMode, std::string> movementToString = {
     {RobotMode::NORMALWALK, "Normal"},
     {RobotMode::BKSTEP, "Backstep"},
-    {RobotMode::FTTG, "Feet Together"}, 
-    {RobotMode::UPSTAIR, "Up stairs"}, 
+    {RobotMode::FTTG, "Feet Together"},
+    {RobotMode::UPSTAIR, "Up stairs"},
     {RobotMode::DWNSTAIR, "Down stairs"},
     {RobotMode::TILTUP, "Up slope"},
     {RobotMode::TILTDWN, "Down slope"},
     {RobotMode::UNEVEN, "Uneven"},
-    {RobotMode::SITDWN, "Sit Down"}, 
+    {RobotMode::SITDWN, "Sit Down"},
     {RobotMode::STNDUP, "Stand Up"},
-    {RobotMode::INITIAL, "Inital Sit"}
-};
+    {RobotMode::INITIAL, "Inital Sit"}};
 
 static std::map<SMState, std::string> stateToString = {
     {Error, "Error"},
     {Init, "Init"},
     {InitSitting, "InitSitting"},
     {LeftForward, "Left Forward"},
-    {RightForward, "Right Forward"}, 
-    {Standing, "Standing"}, 
+    {RightForward, "Right Forward"},
+    {Standing, "Standing"},
     {Sitting, "Sitting"},
     {SittingDown, "Sitting Down"},
     {StandingUp, "Standing Up"},
@@ -103,22 +117,17 @@ static std::map<SMState, std::string> stateToString = {
     {StepLastL, "Step Last L"},
     {StepLastR, "Step Last R"},
     {StepL, "Step Left"},
-    {StepR, "Step Right"}
-};
-
+    {StepR, "Step Right"}};
 
 // Note: Every stage MUST have RobotMode::STNDUP in it
 static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
-    {Default, {RobotMode::NORMALWALK,  RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR,  RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
+    {Default, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
     {UnevenGnd, {RobotMode::NORMALWALK, RobotMode::TILTDWN, RobotMode::STNDUP, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::NORMALWALK, RobotMode::TILTUP, RobotMode::UNEVEN, RobotMode::SITDWN}},
     {Stairs, {RobotMode::NORMALWALK, RobotMode::FTTG, RobotMode::BKSTEP, RobotMode::NORMALWALK, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
     {Tilt, {RobotMode::NORMALWALK, RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
-    {Ramp, {RobotMode::NORMALWALK, RobotMode::DWNSTAIR, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}}
-};
-
+    {Ramp, {RobotMode::NORMALWALK, RobotMode::DWNSTAIR, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}}};
 
 class Crutch {
-
    private:
     /* Jagged array for Current state, next motion relationship */
     // walking, standing and sitting w/ their Next motion lists
@@ -139,14 +148,16 @@ class Crutch {
     int index;
 
     // Button Variables
-    bool nextBut = false;
-    bool prevNextBut = false; // for debounce
-    bool lastBut = false;
-    bool prevLastBut = false; // for debounce
-    bool goBut = false;
+    bool nextBut;
+    bool prevNextBut;          // for debounce
+    int initNextButCount = 0;  // for long press timer
+    bool lastBut;
+    bool prevLastBut;          // for debounce
+    int initLastButCount = 0;  // for long press timer
+    bool goBut;
+    int pressTime;  // for recording length of button press
 
     bool waitGoRelease = true;
-
 
     std::string nextButPath = "/sys/class/gpio/gpio59/value";
     std::string lastButPath = "/sys/class/gpio/gpio58/value";
@@ -156,7 +167,6 @@ class Crutch {
     std::map<int, int> exitMap;
     std::map<int, std::array<int, 11>> stageMap;
     std::map<int, int> indexMap;
-
 
     void updateButtons();
     bool checkButton(std::string path);
@@ -168,9 +178,12 @@ class Crutch {
     void decrementIndex();
     void incrementIndex();
 
-    #ifdef _KEYBOARD
-        Keyboard *kb;
-    #endif
+    void longNextButLogic();
+    void longLastButLogic();
+
+#ifdef _KEYBOARD
+    Keyboard *kb;
+#endif
 
    public:
     Crutch(/* args */);
