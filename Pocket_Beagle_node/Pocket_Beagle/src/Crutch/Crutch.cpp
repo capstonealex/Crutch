@@ -111,8 +111,9 @@ void Crutch::run() {
                 } else {
                     // If the button has not been pressed long enough, execute short press logic
                     incrementIndex();
-                    nextMove = stageMovementList[stage][index];
                 }
+                // Update any stage or movement index changes
+                nextMove = stageMovementList[stage][index];
             }
             if (!lastBut && prevLastBut) {
                 // Upon release, determine how many seconds the button was pressed for
@@ -125,8 +126,9 @@ void Crutch::run() {
                 } else {
                     // If the button has not been pressed long enough, execute short press logic
                     decrementIndex();
-                    nextMove = stageMovementList[stage][index];
                 }
+                // Update any stage or movement index changes
+                nextMove = stageMovementList[stage][index];
             }
             prevNextBut = nextBut;
             prevLastBut = lastBut;
@@ -339,6 +341,8 @@ void Crutch::updateStageExit(){
 	updateIndex();
 }
 */
+
+// For backward cycling between movements
 void Crutch::decrementIndex() {
     index = (index < 1) ? index = stageMovementList[stage].size() - 1 : index - 1;
 
@@ -356,6 +360,7 @@ void Crutch::decrementIndex() {
     }
 }
 
+// For forward cycling between movements
 void Crutch::incrementIndex() {
     index = (index + 1) % stageMovementList[stage].size();
 
@@ -373,12 +378,18 @@ void Crutch::incrementIndex() {
     }
 }
 
-// For forward cycling between stages
-void Crutch::longNextButLogic() {
-    std::cout << "LONG NEXT BUTTON HAS BEEN PRESSED" << std::endl;
+// For backward cycling between stages:
+// - Decrement stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
+// - Reset movement index to the beginning of that stage's list
+void Crutch::longLastButLogic() {
+    stage = (stage < 1) ? stage = Stage(stageMovementList.size() - 1) : Stage(stage - 1);
+    index = 0;
 }
 
-// For backward cycling between stages
-void Crutch::longLastButLogic() {
-    std::cout << "LONG LAST BUTTON HAS BEEN PRESSED" << std::endl;
+// For forward cycling between stages:
+// - Increment stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
+// - Reset movement index to the beginning of that stage's list
+void Crutch::longNextButLogic() {
+    stage = Stage((stage + 1) % stageMovementList.size());
+    index = 0;
 }
