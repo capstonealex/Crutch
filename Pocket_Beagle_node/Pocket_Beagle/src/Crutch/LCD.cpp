@@ -12,8 +12,8 @@
 #define LCD_COLS 20
 #define LCD_ROWS 4
 #define I2C_BUS 1 // NB: Bus 2 is on port 1 on PB
-#define PIN1 9	  //NB: on port 1 (i2c bus 2) of PB
-#define PIN2 11	  //NB: on port 1 (i2c bus 2) of PB
+#define PIN1 9	  //NB: on port 2 (i2c bus 2) of PB
+#define PIN2 11	  //NB: on port 2 (i2c bus 2) of PB
 
 LCD::LCD()
 {

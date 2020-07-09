@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
     bool_t rebootEnable = false;  /* Configurable by arguments */
 
     /*set up command line arguments as variables*/
-    char CANdevice[10] = "can1"; /* change to can1 for bbb vcan0 for virtual can*/
+    char CANdevice[10] = "can0"; /* can0 required for CrutchBeagle, can use vcan0 for virtual can*/
     nodeId = NODEID;
     CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */

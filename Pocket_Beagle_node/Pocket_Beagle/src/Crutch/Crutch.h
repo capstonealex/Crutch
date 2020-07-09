@@ -16,8 +16,8 @@
 #define CLK_FREQ 2000        // Operating frequency of the crutch 'run' function
 #define LONG_PRESS_LENGTH 2  // Number of seconds to hold button to execute long press logic
 
-// #define _NOLCD
-// #define _KEYBOARD
+#define _NOLCD
+#define _KEYBOARD
 
 #include <array>
 #include <map>
@@ -159,8 +159,8 @@ class Crutch {
 
     bool waitGoRelease = true;
 
-    std::string nextButPath = "/sys/class/gpio/gpio59/value";
-    std::string lastButPath = "/sys/class/gpio/gpio58/value";
+    std::string nextButPath = "/sys/class/gpio/gpio65/value";
+    std::string lastButPath = "/sys/class/gpio/gpio27/value";
     std::string goButPath = "/sys/class/gpio/gpio57/value";
 
     std::map<int, int> enterMap;

@@ -54,7 +54,7 @@ $(LINK_TARGET): $(OBJS)
 all: clean $(LINK_TARGET)
 
 clean:
-	rm -f $(OBJS) $(OBJSCPP) $(LINK_TARGET)
+	rm -rf $(OBJS) $(OBJSCPP) $(LINK_TARGET)
 
 %.o: %.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@

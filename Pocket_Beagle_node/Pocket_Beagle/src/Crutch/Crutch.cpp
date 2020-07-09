@@ -12,7 +12,6 @@
 
 Crutch::Crutch(/* args */) {
     std::cout << "Crutch object created" << std::endl;
-
     lcd = new LCD();
 #ifndef _NOLCD
     lcd->setup();
@@ -142,6 +141,7 @@ void Crutch::run() {
                 } else {
                     // If they are not the same, then send the next movement across to the exoskeleton
                     // and do not update the go button on the exo side
+                    std::cout << "Next Move Sent" << std::endl;
                     CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
                 }
             } else {
