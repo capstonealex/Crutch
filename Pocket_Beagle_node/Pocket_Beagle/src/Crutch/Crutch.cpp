@@ -378,17 +378,25 @@ void Crutch::incrementIndex() {
     }
 }
 
-// For backward cycling between stages:
-// - Decrement stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
-// - Reset movement index to the beginning of that stage's list
+/**
+ * \brief For backward cycling between stages:
+ * 
+ * - Decrement stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
+ * - Reset movement index to the beginning of that stage's list
+ * 
+ */
 void Crutch::longLastButLogic() {
     stage = (stage < 1) ? stage = Stage(stageMovementList.size() - 1) : Stage(stage - 1);
     index = 0;
 }
 
-// For forward cycling between stages:
-// - Increment stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
-// - Reset movement index to the beginning of that stage's list
+/**
+ * \brief For forward cycling between stages:
+ * 
+ * - Increment stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
+ * - Reset movement index to the beginning of that stage's list
+ * 
+ */
 void Crutch::longNextButLogic() {
     stage = Stage((stage + 1) % stageMovementList.size());
     index = 0;
