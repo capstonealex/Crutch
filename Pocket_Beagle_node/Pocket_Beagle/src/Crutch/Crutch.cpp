@@ -383,6 +383,7 @@ void Crutch::incrementIndex() {
  * 
  * - Decrement stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
  * - Reset movement index to the beginning of that stage's list
+ * - TODO: Check the movement it's reset to is safe given the current state
  * 
  */
 void Crutch::longLastButLogic() {
@@ -395,6 +396,7 @@ void Crutch::longLastButLogic() {
  * 
  * - Increment stage number (NOTE: Assumes Stage enum type is CONTINUOUS)
  * - Reset movement index to the beginning of that stage's list
+ * - TODO: Check the movement it's reset to is safe given the current state
  * 
  */
 void Crutch::longNextButLogic() {
