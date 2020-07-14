@@ -33,43 +33,47 @@
 using namespace std;
 
 enum class RobotMode {
-    NORMALWALK,
-    SITDWN,
-    STNDUP,
-    UPSTAIR,
-    DWNSTAIR,
-    TILTUP,
-    TILTDWN,
-    BKSTEP,
-    FTTG,
-    UNEVEN,
-    INITIAL
+    NORMALWALK, /**< 0 */
+    SITDWN,     /**< 1 */
+    STNDUP,     /**< 2 */
+    UPSTAIR,    /**< 3 */
+    DWNSTAIR,   /**< 4 */
+    TILTUP,     /**< 5 */
+    TILTDWN,    /**< 6 */
+    BKSTEP,     /**< 7 */
+    FTTG,       /**< 8 */
+    UNEVEN,     /**< 9 */
+    INITIAL     /**< 10 */
 };
 
 // Incompatible state:Movement Pairs:
 // Sitting -> can only stand
 // Feet Together -> only when not in standing
 
-enum SMState { Error,
-               Init,
-               InitSitting,
-               LeftForward,
-               RightForward,
-               Standing,
-               Sitting,
-               SittingDown,
-               StandingUp,
-               StepFirstL,
-               StepFirstR,
-               StepLastL,
-               StepLastR,
-               StepL,
-               StepR };
-enum Stage { Default,
-             UnevenGnd,
-             Stairs,
-             Tilt,
-             Ramp };
+enum SMState { Error,        /**< 0 */
+               Init,         /**< 1 */
+               InitSitting,  /**< 2 */
+               LeftForward,  /**< 3 */
+               RightForward, /**< 4 */
+               Standing,     /**< 5 */
+               Sitting,      /**< 6 */
+               SittingDown,  /**< 7 */
+               StandingUp,   /**< 8 */
+               StepFirstL,   /**< 9 */
+               StepFirstR,   /**< 10 */
+               StepLastL,    /**< 11 */
+               StepLastR,    /**< 12 */
+               StepL,        /**< 13 */
+               StepR         /**< 14 */
+};
+
+enum Stage { Default,   /**< 0 */
+             SitStand,  /**< 1 */
+             UnevenGnd, /**< 2 */
+             Stairs,    /**< 3 */
+             Tilt,      /**< 4 */
+             Ramp       /**< 5 */
+};
 
 static std::map<SMState, bool> stateStationaryStatus = {
     {Error, true},
@@ -119,6 +123,7 @@ static std::map<SMState, std::string> stateToString = {
     {StepL, "Step Left"},
     {StepR, "Step Right"}};
 
+/** MAP BEFORE RnD list changes (Just need to uncomment and delete SitStand stage to use)
 // Note: Every stage MUST have RobotMode::STNDUP in it
 static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
     {Default, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
@@ -126,6 +131,16 @@ static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
     {Stairs, {RobotMode::NORMALWALK, RobotMode::FTTG, RobotMode::BKSTEP, RobotMode::NORMALWALK, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
     {Tilt, {RobotMode::NORMALWALK, RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
     {Ramp, {RobotMode::NORMALWALK, RobotMode::DWNSTAIR, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}}};
+**/
+
+// Note: Every stage MUST have RobotMode::STNDUP in it
+static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
+    {Default, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
+    {SitStand, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::SITDWN, RobotMode::STNDUP}},
+    {UnevenGnd, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::UNEVEN, RobotMode::STNDUP}},
+    {Stairs, {RobotMode::NORMALWALK, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP}},
+    {Tilt, {RobotMode::NORMALWALK, RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
+    {Ramp, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN}}};
 
 class Crutch {
    private:
