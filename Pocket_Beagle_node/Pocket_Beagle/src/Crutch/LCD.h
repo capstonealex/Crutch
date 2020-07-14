@@ -34,6 +34,9 @@ public:
 
 	void flash();
 
+	void backlightOn();
+	void backlightOff();
+
 	void commControlOn();
 	void commControlOff();
 

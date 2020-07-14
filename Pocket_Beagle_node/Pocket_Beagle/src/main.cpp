@@ -89,6 +89,11 @@ struct period_info
 static void inc_period(struct period_info *pinfo);
 static void periodic_task_init(struct period_info *pinfo);
 static void wait_rest_of_period(struct period_info *pinfo);
+
+// Forward declaration of helper functions
+void configureCANopen(int nodeId, int rtPriority, int CANdevice0Index, char *CANdevice);
+
+
 /* Realtime thread */
 static void *rt_thread(void *arg);
 static pthread_t rt_thread_id;
@@ -103,6 +108,7 @@ static void sigHandler(int sig)
 {
     CO_endProgram = 1;
 }
+
 
 /* Helper functions ***********************************************************/
 void CO_errExit(char *msg)
@@ -125,74 +131,46 @@ int main(int argc, char *argv[])
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
     CO_ReturnError_t odStorStatus_rom, odStorStatus_eeprom;
-    int CANdevice0Index = 0;
     int opt;
     bool_t firstRun = true;
     bool_t nodeIdFromArgs = true; /* True, if program arguments are used for CANopen Node Id */
-    int nodeId = -1;              /* Use value from Object Dictionary or set to 1..127 by arguments */
     bool_t rebootEnable = false;  /* Configurable by arguments */
-
-    /*set up command line arguments as variables*/
-    char CANdevice[10] = "can0"; /* can0 required for CrutchBeagle, can use vcan0 for virtual can*/
-    nodeId = NODEID;
-    CANdevice0Index = if_nametoindex(CANdevice);
     bool_t commandEnable = false; /* Configurable by arguments */
-    opt = 'c';
-    /* Get program options */
-    switch (opt)
-    {
 
-    case 'p':
-        rtPriority = strtol(optarg, NULL, 0);
-        break;
+     int nodeId = NODEID;                                           /*!< CAN Network NODEID */
 
-    case 'c':
-        /* In case of empty string keep default name, just enable interface. */
-        if (strlen(optarg) != 0)
-        {
-            // CO_command_socketPath = "/tmp/CO_command_socket";
+    int can_dev_number=6;
+    char CANdeviceList[can_dev_number][10] = {"vcan0\0", "can0\0", "can1\0", "can2\0", "can3\0", "can4\0"};    /*!< linux CAN device interface for app to bind to: change to can1 for bbb, can0 for BBAI vcan0 for virtual can*/
+    char CANdevice[10]="";
+    int CANdevice0Index;
+    //Rotate through list of interfaces and select first one existing and up
+    for(unsigned i=0; i<can_dev_number; i++) {
+        printf("%s: ", CANdeviceList[i]);
+        //Check if interface exists
+        CANdevice0Index = if_nametoindex(CANdeviceList[i]);/*map linux CAN interface to corresponding int index return zero if no interface exists.*/
+        if(CANdevice0Index!=0) {
+            char operstate_filename[255], operstate_s[25];
+            snprintf(operstate_filename, 254, "/sys/class/net/%s/operstate", CANdeviceList[i]);
+            //Check if it's up
+            FILE* operstate_f = fopen(operstate_filename, "r");
+            fscanf(operstate_f, "%s", &operstate_s);
+            printf("%s\n", operstate_s);
+            //Check if not "down" as will be "unknown" if up
+            if(strcmp(operstate_s, "down")!=0) {
+                snprintf(CANdevice, 9, "%s", CANdeviceList[i]);
+                printf("Using: %s (%d)\n", CANdeviceList[i], CANdevice0Index);
+                break;
+            }
+            else {
+                CANdevice0Index=0;
+            }
         }
-        commandEnable = true;
-        break;
-    }
+        else {
+            printf("-\n");
+        }
 
-    if (nodeId < 1 || nodeId > 127)
-    {
-        fprintf(stderr, "Wrong node ID (%d)\n", nodeId);
-        exit(EXIT_FAILURE);
     }
-
-    if (rtPriority != -1 && (rtPriority < sched_get_priority_min(SCHED_FIFO) || rtPriority > sched_get_priority_max(SCHED_FIFO)))
-    {
-        fprintf(stderr, "Wrong RT priority (%d)\n", rtPriority);
-        exit(EXIT_FAILURE);
-    }
-
-    if (CANdevice0Index == 0)
-    {
-        char s[120];
-        snprintf(s, 120, "Can't find CAN device \"%s\"", CANdevice);
-        CO_errExit(s);
-    }
-
-    printf("starting CANopen device with Node ID %d(0x%02X)", nodeId, nodeId);
-
-    /* Verify, if OD structures have proper alignment of initial values */
-    if (CO_OD_RAM.FirstWord != CO_OD_RAM.LastWord)
-    {
-        fprintf(stderr, "Program init - Canopend- Error in CO_OD_RAM.\n");
-        exit(EXIT_FAILURE);
-    }
-    if (CO_OD_EEPROM.FirstWord != CO_OD_EEPROM.LastWord)
-    {
-        fprintf(stderr, "Program init - Canopend - Error in CO_OD_EEPROM.\n");
-        exit(EXIT_FAILURE);
-    }
-    if (CO_OD_ROM.FirstWord != CO_OD_ROM.LastWord)
-    {
-        fprintf(stderr, "Program init - Canopend - Error in CO_OD_ROM.\n");
-        exit(EXIT_FAILURE);
-    }
+    configureCANopen(nodeId, rtPriority, CANdevice0Index, CANdevice);
 
     /* Catch signals SIGINT and SIGTERM */
     if (signal(SIGINT, sigHandler) == SIG_ERR)
@@ -503,3 +481,27 @@ static void wait_rest_of_period(struct period_info *pinfo)
     /* for simplicity, ignoring possibilities of signal wakes */
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &pinfo->next_period, NULL);
 }
+
+void configureCANopen(int nodeId, int rtPriority, int CANdevice0Index, char *CANdevice) {
+    if (nodeId < 1 || nodeId > 127) {
+        fprintf(stderr, "NODE ID outside range (%d)\n", nodeId);
+        exit(EXIT_FAILURE);
+    }
+    // rt Thread priority sanity check
+    if (rtPriority != -1 && (rtPriority < sched_get_priority_min(SCHED_FIFO) || rtPriority > sched_get_priority_max(SCHED_FIFO))) {
+        fprintf(stderr, "Wrong RT priority (%d)\n", rtPriority);
+        exit(EXIT_FAILURE);
+    }
+
+    if (CANdevice0Index == 0) {
+        char s[120];
+        snprintf(s, 120, "Can't find CAN device \"%s\"", CANdevice);
+        CO_errExit(s);
+    }
+
+    /* Verify, if OD structures have proper alignment of initial values */
+    if (CO_OD_RAM.FirstWord != CO_OD_RAM.LastWord) {
+        fprintf(stderr, "Program init - Canopend- Error in CO_OD_RAM.\n");
+        exit(EXIT_FAILURE);
+    }
+};

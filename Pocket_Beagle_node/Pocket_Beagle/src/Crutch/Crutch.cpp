@@ -25,6 +25,7 @@ Crutch::Crutch(/* args */) {
 #endif
 }
 
+
 Crutch::~Crutch() {
     lcd->~LCD();
 
@@ -141,7 +142,7 @@ void Crutch::run() {
                 } else {
                     // If they are not the same, then send the next movement across to the exoskeleton
                     // and do not update the go button on the exo side
-                    std::cout << "Next Move Sent" << std::endl;
+                    //std::cout << "Next Move Sent" << std::endl;
                     CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
                 }
             } else {
@@ -167,6 +168,13 @@ void Crutch::printCSNM() {
 // If the state has changed - update the screen to show the state
 #ifndef _NOLCD
         lcd->printCurrState(stateToString[currState]);
+        if (isStationaryState(currState)){
+            lcd->backlightOn();
+        } else
+        {
+            lcd->backlightOff();
+        }
+        
 #endif
         //sleep(1);
         std::cout << "Curr State: " << stateToString[currState] << std::endl;
@@ -314,7 +322,9 @@ bool Crutch::checkButton(std::string path) {
     stream >> value;
     stream.close();
 
-    if (value == '1') {
+
+    // GPIO are configured as pull up. Value is pulled down to 0 when the buttons are pressed. 
+    if (value == '0') {
         return true;
     } else {
         return false;

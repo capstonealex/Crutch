@@ -103,6 +103,14 @@ void LCD::flash()
 	lcd->backlight();
 }
 
+eatvoid LCD::backlightOn(){
+	lcd->backlight();
+}
+
+void LCD::backlightOff(){
+	lcd->noBacklight();
+}
+
 void LCD::commControlOn()
 {
 	lcd->commControlOn();
