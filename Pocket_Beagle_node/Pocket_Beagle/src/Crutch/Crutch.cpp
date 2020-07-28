@@ -294,6 +294,7 @@ void Crutch::incrementIndex() {
 void Crutch::longLastButLogic() {
     stage = (stage < 1) ? stage = Stage(stageMovementList.size() - 1) : Stage(stage - 1);
     index = 0;
+    incrementIndexSafely();
 }
 
 /**
@@ -307,34 +308,40 @@ void Crutch::longLastButLogic() {
 void Crutch::longNextButLogic() {
     stage = Stage((stage + 1) % stageMovementList.size());
     index = 0;
+    incrementIndexSafely();
 }
 
 /** 
- * \brief Prevents unwanted movements given current state 
+ * \brief Cycles index up when currently is an unwanted movement
  * 
- *  - If sitting, only option is to stand up, search for that entry in the list
- *  - Only allow stand up in the sitting state
- *  - To only allow sitting when feet are together
- *  - To prevent a Feet Together Movement when feet are already together
 */
 void Crutch::incrementIndexSafely() {
-    while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) ||
-           (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
-           (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) ||
-           (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG)) {
+    while (isBadMovement()) {
         index = (index + 1) % stageMovementList[stage].size();
     }
 }
 
 /**
- * \brief Prevents unwanted movements given current state
+ * \brief Cycles index down when currently is an unwanted movement
  * 
  */
 void Crutch::decrementIndexSafely() {
-    while ((currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) ||
-           (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
-           (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) ||
-           (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG)) {
+    while (isBadMovement()) {
         index = (index < 1) ? index = stageMovementList[stage].size() - 1 : index - 1;
     }
+}
+
+/**
+ * \brief Checks if the current movement is not wanted given the current state
+ * 
+ *  - If sitting, only option is to stand up, search for that entry in the list
+ *  - Only allow stand up in the sitting state
+ *  - To only allow sitting when feet are together
+ *  - To prevent a Feet Together Movement when feet are already together 
+ */
+bool Crutch::isBadMovement() {
+    return (currState == SMState::Sitting && stageMovementList[stage][index] != RobotMode::STNDUP) ||
+           (currState != SMState::Sitting && stageMovementList[stage][index] == RobotMode::STNDUP) ||
+           (stageMovementList[stage][index] == RobotMode::SITDWN && currState != SMState::Standing) ||
+           (currState == SMState::Standing && stageMovementList[stage][index] == RobotMode::FTTG);
 }

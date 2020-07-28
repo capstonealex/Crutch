@@ -194,6 +194,7 @@ class Crutch {
     void decrementIndexSafely();
     void incrementIndex();
     void incrementIndexSafely();
+    bool isBadMovement();
 
     void longNextButLogic();
     void longLastButLogic();
