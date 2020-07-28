@@ -191,7 +191,9 @@ class Crutch {
     void updateStageExit();
 
     void decrementIndex();
+    void decrementIndexSafely();
     void incrementIndex();
+    void incrementIndexSafely();
 
     void longNextButLogic();
     void longLastButLogic();
