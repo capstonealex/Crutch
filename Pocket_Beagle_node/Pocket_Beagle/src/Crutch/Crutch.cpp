@@ -103,11 +103,11 @@ void Crutch::run() {
         } else {
             // Keyboard input for long-press logic
 #ifdef _KEYBOARD
-            if (!longNextBut && prevLongNextBut) {
+            if (!longNextBut && prevLongNextBut && (currState != SMState::Error)) {
                 longNextButLogic();
                 nextMove = stageMovementList[stage][index];
             }
-            if (!longLastBut && prevLongLastBut) {
+            if (!longLastBut && prevLongLastBut && (currState != SMState::Error)) {
                 longLastButLogic();
                 nextMove = stageMovementList[stage][index];
             }
@@ -123,8 +123,8 @@ void Crutch::run() {
                 initLastButCount = counter;
             }
 
-            // Execute logic when button is released
-            if (!nextBut && prevNextBut) {
+            // Execute logic when button is released (Note: Do not want to execute logic when in error state)
+            if (!nextBut && prevNextBut && (currState != SMState::Error)) {
                 // Upon release, determine how many seconds the button was pressed for
                 pressTime = (counter - initNextButCount) / CLK_FREQ;
 
@@ -139,7 +139,7 @@ void Crutch::run() {
                 // Update any stage or movement index changes
                 nextMove = stageMovementList[stage][index];
             }
-            if (!lastBut && prevLastBut) {
+            if (!lastBut && prevLastBut && (currState != SMState::Error)) {
                 // Upon release, determine how many seconds the button was pressed for
                 pressTime = (counter - initLastButCount) / CLK_FREQ;
 
