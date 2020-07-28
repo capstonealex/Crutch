@@ -201,6 +201,10 @@ class Crutch {
 
 #ifdef _KEYBOARD
     Keyboard *kb;
+    bool longLastBut;
+    bool longNextBut;
+    bool prevLongNextBut;
+    bool prevLongLastBut;
 #endif
 
    public:

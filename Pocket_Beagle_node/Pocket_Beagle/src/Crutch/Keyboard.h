@@ -18,6 +18,7 @@
 #define KEYBOARD_H_INCLUDED
 
 #include <unistd.h>
+
 #include <iostream>
 
 #include "termios.h"
@@ -35,11 +36,12 @@ typedef struct keys {
     bool w;
     bool x;
     bool q;
+    bool e;
 } key_states;
 
-class Keyboard  {
+class Keyboard {
    private:
-    key_states currentKeyStates = {false, false, false, false, false, false};
+    key_states currentKeyStates = {false, false, false, false, false, false, false};
     int keyboardActive;
 
    public:
@@ -109,6 +111,11 @@ class Keyboard  {
  * 
  */
     bool getQ();
+    /**
+ * \brief Getter method for private E key state
+ * 
+ */
+    bool getE();
     /**
  * \brief Termios structs for turning on and off terminal echo
  * 

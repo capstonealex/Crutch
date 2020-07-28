@@ -89,6 +89,22 @@ void Crutch::run() {
                 waitGoRelease = false;
             }
         } else {
+            // Keyboard input for long-press logic
+#ifdef _KEYBOARD
+            if (!longNextBut && prevLongNextBut) {
+                longNextButLogic();
+                nextMove = stageMovementList[stage][index];
+                std::cout << "Long next triggered" << std::endl;
+            }
+            if (!longLastBut && prevLongLastBut) {
+                longLastButLogic();
+                nextMove = stageMovementList[stage][index];
+                std::cout << "Long last triggered" << std::endl;
+            }
+            prevLongNextBut = longNextBut;
+            prevLongLastBut = longLastBut;
+#endif
+
             // Start timer when button is pressed
             if (nextBut && !prevNextBut) {
                 initNextButCount = counter;
@@ -240,6 +256,8 @@ void Crutch::updateButtons() {
     kb->updateInput();
     nextBut = kb->getA();
     lastBut = kb->getS();
+    longNextBut = kb->getE();
+    longLastBut = kb->getQ();
 
     if (kb->getD()) {
         goBut = !goBut;

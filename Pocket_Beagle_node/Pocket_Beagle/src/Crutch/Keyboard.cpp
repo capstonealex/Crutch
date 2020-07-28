@@ -60,6 +60,10 @@ void Keyboard::setKeys() {
         case 'Q':
             currentKeyStates.q = true;
             break;
+        case 'e':
+        case 'E':
+            currentKeyStates.e = true;
+            break;
         default:
             keyboardActive = 0;
     }
@@ -97,6 +101,8 @@ void Keyboard::clearCurrentStates() {
     currentKeyStates.d = false;
     currentKeyStates.w = false;
     currentKeyStates.x = false;
+    currentKeyStates.q = false;
+    currentKeyStates.e = false;
 }
 bool Keyboard::getA() {
     return currentKeyStates.a;
@@ -116,6 +122,9 @@ bool Keyboard::getX() {
 };
 bool Keyboard::getQ() {
     return currentKeyStates.q;
+};
+bool Keyboard::getE() {
+    return currentKeyStates.e;
 };
 int Keyboard::kbhit() {
     struct timeval tv;
