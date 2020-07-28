@@ -81,6 +81,11 @@ void Crutch::run() {
             std::cout << "Finished Move" << std::endl;
             waitGoRelease = true;
             CO_OD_RAM.goButton = static_cast<uint16_t>(false);
+
+            // Triggers (for e.g.) when exo has just stood after sitting - don't want next movement to be standing again
+            if (isBadMovement()) {
+                incrementIndex();
+            }
         }
         if (waitGoRelease) {
             // Waiting for Go Button to be released
