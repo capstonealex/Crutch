@@ -46,6 +46,13 @@ void Crutch::run() {
     // Take the current state from the object dictionary - this is passed on from the OD on the Main Beaglebone
     currState = static_cast<SMState>(CO_OD_RAM.currentState);
 
+    // Checking current state for use without exo
+#ifdef _KEYBOARD
+    if (kb->getX()) {
+        std::cout << "Current State: " << stateToString[currState] << std::endl;
+    }
+#endif
+
     // This is a record of the number of iterations of this device
     incrementCount();
 
@@ -99,12 +106,10 @@ void Crutch::run() {
             if (!longNextBut && prevLongNextBut) {
                 longNextButLogic();
                 nextMove = stageMovementList[stage][index];
-                std::cout << "Long next triggered" << std::endl;
             }
             if (!longLastBut && prevLongLastBut) {
                 longLastButLogic();
                 nextMove = stageMovementList[stage][index];
-                std::cout << "Long last triggered" << std::endl;
             }
             prevLongNextBut = longNextBut;
             prevLongLastBut = longLastBut;
