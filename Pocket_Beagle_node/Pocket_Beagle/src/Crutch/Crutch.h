@@ -97,14 +97,14 @@ static std::map<RobotMode, std::string> movementToString = {
     {RobotMode::NORMALWALK, "Normal"},
     {RobotMode::BKSTEP, "Backstep"},
     {RobotMode::FTTG, "Feet Together"},
-    {RobotMode::UPSTAIR, "Up stairs"},
-    {RobotMode::DWNSTAIR, "Down stairs"},
-    {RobotMode::TILTUP, "Up slope"},
-    {RobotMode::TILTDWN, "Down slope"},
+    {RobotMode::UPSTAIR, "Up Stairs"},
+    {RobotMode::DWNSTAIR, "Down Stairs"},
+    {RobotMode::TILTUP, "Up Slope"},
+    {RobotMode::TILTDWN, "Down Slope"},
     {RobotMode::UNEVEN, "Uneven"},
     {RobotMode::SITDWN, "Sit Down"},
     {RobotMode::STNDUP, "Stand Up"},
-    {RobotMode::INITIAL, "Inital Sit"}};
+    {RobotMode::INITIAL, "Initial Sit"}};
 
 static std::map<SMState, std::string> stateToString = {
     {Error, "Error"},
