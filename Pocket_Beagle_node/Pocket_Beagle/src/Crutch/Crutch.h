@@ -50,21 +50,21 @@ enum class RobotMode {
 // Sitting -> can only stand
 // Feet Together -> only when not in standing
 
-enum SMState { Error,        /**< 0 */
-               Init,         /**< 1 */
-               InitSitting,  /**< 2 */
-               LeftForward,  /**< 3 */
-               RightForward, /**< 4 */
-               Standing,     /**< 5 */
-               Sitting,      /**< 6 */
-               SittingDown,  /**< 7 */
-               StandingUp,   /**< 8 */
-               StepFirstL,   /**< 9 */
-               StepFirstR,   /**< 10 */
-               StepLastL,    /**< 11 */
-               StepLastR,    /**< 12 */
-               StepL,        /**< 13 */
-               StepR         /**< 14 */
+enum SMState { Init,         /**< 0 */
+               InitSitting,  /**< 1 */
+               LeftForward,  /**< 2 */
+               RightForward, /**< 3 */
+               Standing,     /**< 4 */
+               Sitting,      /**< 5 */
+               SittingDown,  /**< 6 */
+               StandingUp,   /**< 7 */
+               StepFirstL,   /**< 8 */
+               StepFirstR,   /**< 9 */
+               StepLastL,    /**< 10 */
+               StepLastR,    /**< 11 */
+               StepL,        /**< 12 */
+               StepR,        /**< 13 */
+               Error         /**< 14 */
 };
 
 enum Stage { Default,   /**< 0 */

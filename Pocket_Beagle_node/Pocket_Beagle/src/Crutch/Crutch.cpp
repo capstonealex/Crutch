@@ -32,8 +32,8 @@ Crutch::~Crutch() {
 }
 
 void Crutch::initCrutch() {
-    lastState = Error;
-    currState = Error;
+    lastState = Init;
+    currState = Init;
 
     lastNextMove = RobotMode::DWNSTAIR;  // This is irrelevant - just needed to make sure that it prints to the screen on the first press
     nextMove = RobotMode::NORMALWALK;
@@ -71,6 +71,7 @@ void Crutch::run() {
             nextMove = RobotMode::INITIAL;
             std::cout << "Start Buttons Pressed" << std::endl;
             CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
+            CO_OD_RAM.currentState = static_cast<SMState>(Standing);  // Arbitrary state, use for testing with keyboard
         }
 #endif
 
@@ -88,13 +89,12 @@ void Crutch::run() {
             std::cout << "Finished Move" << std::endl;
             waitGoRelease = true;
             CO_OD_RAM.goButton = static_cast<uint16_t>(false);
-            
+
             // Triggers (for e.g.) when exo has just stood after sitting - don't want next movement to be standing again
             if (isBadMovement()) {
                 incrementIndex();
                 nextMove = stageMovementList[stage][index];
             }
-
         }
         if (waitGoRelease) {
             // Waiting for Go Button to be released
@@ -284,6 +284,7 @@ void Crutch::updateButtons() {
     nextBut = checkButton(nextButPath);
     lastBut = checkButton(lastButPath);
     goBut = checkButton(goButPath);
+    // std::cout << "NextBut: " << nextBut << ", LastBut: " << lastBut << ", Trigger: " << goBut << std::endl;
 #endif
 }
 
