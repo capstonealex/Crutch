@@ -18,6 +18,7 @@
 
 // #define _NOLCD
 // #define _KEYBOARD
+#define _NOROBOT
 
 #include <array>
 #include <map>

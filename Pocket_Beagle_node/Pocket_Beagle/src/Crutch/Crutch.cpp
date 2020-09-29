@@ -64,6 +64,9 @@ void Crutch::run() {
             nextMove = RobotMode::INITIAL;
             std::cout << "Start Buttons Pressed" << std::endl;
             CO_OD_RAM.nextMovement = static_cast<uint16_t>(nextMove);
+#ifdef _NOROBOT
+            CO_OD_RAM.currentState = static_cast<SMState>(Standing);  // Arbitrary state
+#endif
         }
 
 #ifdef _KEYBOARD
