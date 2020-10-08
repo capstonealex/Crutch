@@ -18,7 +18,7 @@
 
 // #define _NOLCD
 // #define _KEYBOARD
-#define _NOROBOT
+// #define _NOROBOT
 
 #include <array>
 #include <map>
@@ -65,7 +65,9 @@ enum SMState { Init,         /**< 0 */
                StepLastR,    /**< 11 */
                StepL,        /**< 12 */
                StepR,        /**< 13 */
-               Error         /**< 14 */
+               BackStepR,    /**< 14 */
+               BackStepL,    /**< 15 */
+               Error         /**< 16 */
 };
 
 enum Stage { Default,   /**< 0 */
@@ -91,7 +93,10 @@ static std::map<SMState, bool> stateStationaryStatus = {
     {StepLastL, false},
     {StepLastR, false},
     {StepL, false},
-    {StepR, false}};
+    {StepR, false},
+    {BackStepL, false},
+    {BackStepR, false}
+};
 
 /*Look Up table to convert between nextMotion selections and OD int outputs to exo BBB*/
 static std::map<RobotMode, std::string> movementToString = {
@@ -105,7 +110,8 @@ static std::map<RobotMode, std::string> movementToString = {
     {RobotMode::UNEVEN, "Uneven"},
     {RobotMode::SITDWN, "Sit Down"},
     {RobotMode::STNDUP, "Stand Up"},
-    {RobotMode::INITIAL, "Initial Sit"}};
+    {RobotMode::INITIAL, "Initial Sit"}
+};
 
 static std::map<SMState, std::string> stateToString = {
     {Error, "Error"},
@@ -122,7 +128,10 @@ static std::map<SMState, std::string> stateToString = {
     {StepLastL, "Step Last L"},
     {StepLastR, "Step Last R"},
     {StepL, "Step Left"},
-    {StepR, "Step Right"}};
+    {StepR, "Step Right"},
+    {BackStepL, "Back Step left"},
+    {BackStepR, "Back Step Right"}
+};
 
 /** MAP BEFORE RnD list changes (Just need to uncomment and delete SitStand stage to use)
 // Note: Every stage MUST have RobotMode::STNDUP in it

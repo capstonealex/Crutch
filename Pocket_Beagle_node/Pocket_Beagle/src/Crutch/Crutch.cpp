@@ -12,8 +12,8 @@
 
 Crutch::Crutch(/* args */) {
     std::cout << "Crutch object created" << std::endl;
-    lcd = new LCD();
 #ifndef _NOLCD
+    lcd = new LCD();
     lcd->setup();
 #endif
 
