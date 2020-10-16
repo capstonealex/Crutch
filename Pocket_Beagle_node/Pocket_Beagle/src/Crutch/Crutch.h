@@ -41,10 +41,12 @@ enum class RobotMode {
     DWNSTAIR,   /**< 4 */
     TILTUP,     /**< 5 */
     TILTDWN,    /**< 6 */
-    BKSTEP,     /**< 7 */
-    FTTG,       /**< 8 */
-    UNEVEN,     /**< 9 */
-    INITIAL     /**< 10 */
+    RAMPUP,     /**< 7 */
+    RAMPDWN,    /**< 8 */
+    BKSTEP,     /**< 9 */
+    FTTG,       /**< 10 */
+    UNEVEN,     /**< 11 */
+    INITIAL     /**< 12 */
 };
 
 // Incompatible state:Movement Pairs:
@@ -105,8 +107,10 @@ static std::map<RobotMode, std::string> movementToString = {
     {RobotMode::FTTG, "Feet Together"},
     {RobotMode::UPSTAIR, "Up Stairs"},
     {RobotMode::DWNSTAIR, "Down Stairs"},
-    {RobotMode::TILTUP, "Up Slope"},
-    {RobotMode::TILTDWN, "Down Slope"},
+    {RobotMode::TILTUP, "Up Tilt"},
+    {RobotMode::TILTDWN, "Down Tilt"},
+    {RobotMode::RAMPUP, "Up Ramp"},
+    {RobotMode::RAMPDWN, "Down Ramp"},
     {RobotMode::UNEVEN, "Uneven"},
     {RobotMode::SITDWN, "Sit Down"},
     {RobotMode::STNDUP, "Stand Up"},
@@ -145,12 +149,13 @@ static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
 
 // Note: Every stage MUST have RobotMode::STNDUP in it
 static std::map<Stage, std::vector<RobotMode>> stageMovementList = {
-    {Default, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
+    // Original Default one {Default, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::RAMPUP, RobotMode::RAMPDWN, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
+    {Default, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::UNEVEN, RobotMode::STNDUP, RobotMode::SITDWN}},
     {SitStand, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::SITDWN, RobotMode::STNDUP}},
     {UnevenGnd, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::UNEVEN, RobotMode::STNDUP}},
     {Stairs, {RobotMode::NORMALWALK, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP}},
     {Tilt, {RobotMode::NORMALWALK, RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::FTTG, RobotMode::UPSTAIR, RobotMode::DWNSTAIR, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN, RobotMode::UNEVEN, RobotMode::SITDWN}},
-    {Ramp, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::STNDUP, RobotMode::TILTUP, RobotMode::TILTDWN}}};
+    {Ramp, {RobotMode::NORMALWALK, RobotMode::BKSTEP, RobotMode::STNDUP, RobotMode::RAMPUP, RobotMode::RAMPDWN}}};
 
 class Crutch {
    private:
